@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Chat</title>
+</head>
+
+<body>
+    <h1>Chat</h1>
+    <div id="messages"></div>
+    <form id="f">
+        <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) {
+            document.body.innerHTML = '<p>Necesitas iniciar sesión para usar el chat. <a href="/login.html">Login</a></p>';
+            throw new Error('No token');
+        }
+
+        const socket = io({ auth: { token } });
+
+        socket.on('connect_error', (err) => {
+            console.error('Connection error', err);
+            document.body.insertAdjacentHTML('beforeend', `<p style="color:red">Error conectando al chat: ${err.message}</p>`);
+        });
+
+        socket.on('chat:message', (msg) => {
+            const el = document.createElement('div');
+            el.textContent = `${msg.user.username}: ${msg.text}`;
+            document.getElementById('messages').appendChild(el);
+        });
+
+        document.getElementById('f').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = document.getElementById('m').value;
+            if (!text) return;
+            socket.emit('chat:message', { text });
+            document.getElementById('m').value = '';
+        });
+    </script>
+</body>
+
+</html>
