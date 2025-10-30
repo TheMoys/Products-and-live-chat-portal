@@ -1,0 +1,196 @@
+.home-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+    padding: var(--spacing-md);
+}
+
+.navbar {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-md);
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.navbar-brand h1 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    color: var(--neon-blue);
+    text-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+    margin: 0;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.user-badge {
+    background: rgba(0, 243, 255, 0.1);
+    border: 1px solid var(--neon-blue);
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.user-badge .username {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.user-badge .role {
+    color: var(--neon-blue);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-logout {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid #ef4444;
+    color: #fca5a5;
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-display);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+.home-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.welcome-section {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+}
+
+.welcome-section h2 {
+    font-size: 48px;
+    color: var(--neon-blue);
+    margin-bottom: var(--spacing-sm);
+    text-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+}
+
+.welcome-section p {
+    color: var(--text-secondary);
+    font-size: 18px;
+}
+
+.navigation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.nav-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.nav-card:hover::before {
+    left: 100%;
+}
+
+.nav-card:hover {
+    border-color: var(--neon-blue);
+    transform: translateY(-8px);
+    box-shadow: 0 0 40px rgba(0, 243, 255, 0.3);
+}
+
+.nav-card-icon {
+    font-size: 64px;
+    margin-bottom: var(--spacing-md);
+}
+
+.nav-card h3 {
+    color: var(--neon-blue);
+    font-size: 24px;
+    margin-bottom: var(--spacing-sm);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.nav-card p {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.admin-badge {
+    display: inline-block;
+    background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
+    padding: 4px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: var(--spacing-sm);
+    font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .navigation-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .welcome-section h2 {
+        font-size: 32px;
+    }
+}
