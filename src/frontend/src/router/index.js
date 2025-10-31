@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
     history: createWebHistory(),
@@ -6,17 +7,20 @@ const router = createRouter({
         {
             path: '/',
             name: 'home',
-            component: () => import('@/views/HomeView.vue')
+            component: () => import('@/views/HomeView.vue'),
+            meta: { requiresAuth: true }
         },
         {
             path: '/login',
             name: 'login',
-            component: () => import('@/views/LoginView.vue')
+            component: () => import('@/views/LoginView.vue'),
+            meta: { guest: true }
         },
         {
             path: '/register',
             name: 'register',
-            component: () => import('@/views/RegisterView.vue')
+            component: () => import('@/views/RegisterView.vue'),
+            meta: { guest: true }
         },
         {
             path: '/products',
@@ -33,15 +37,30 @@ const router = createRouter({
     ]
 })
 
+router.beforeEach(async (to, from, next) => {
+    const authStore = useAuthStore()
 
-router.beforeEach((to, from, next) => {
-    const token = localStorage.getItem('token')
+    if (to.meta.requiresAuth) {
 
-    if (to.meta.requiresAuth && !token) {
-        next('/login')
-    } else if ((to.name === 'login' || to.name === 'register') && token) {
-        next('/')
-    } else {
+        if (!authStore.isAuthenticated) {
+            const isValid = await authStore.checkAuth()
+
+            if (!isValid) {
+                next('/login')
+                return
+            }
+        }
+        next()
+    }
+
+    else if (to.meta.guest) {
+        if (authStore.isAuthenticated) {
+            next('/')
+            return
+        }
+        next()
+    }
+    else {
         next()
     }
 })

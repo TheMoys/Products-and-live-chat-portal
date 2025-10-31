@@ -4,9 +4,10 @@ import axios from '@/services/axios'
 
 export const useAuthStore = defineStore('auth', () => {
     const user = ref(null)
-    const token = ref(localStorage.getItem('token') || null)
+    const token = ref(null)
+    const loading = ref(false)
 
-    const isAuthenticated = computed(() => !!token.value)
+    const isAuthenticated = computed(() => !!token.value && !!user.value)
     const isAdmin = computed(() => user.value?.role === 'admin')
 
     function setAuth(userData, userToken) {
@@ -23,33 +24,59 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.removeItem('user')
     }
 
-    function checkAuth() {
+    async function checkAuth() {
         const storedToken = localStorage.getItem('token')
         const storedUser = localStorage.getItem('user')
 
-        if (storedToken && storedUser) {
+        if (!storedToken || !storedUser) {
+            clearAuth()
+            return false
+        }
+
+        try {
+
             token.value = storedToken
             user.value = JSON.parse(storedUser)
+
+
+            const response = await axios.get('/auth/verify')
+
+            if (response.data.valid) {
+                return true
+            } else {
+                clearAuth()
+                return false
+            }
+        } catch (error) {
+            console.error('Token inválido o expirado:', error)
+            clearAuth()
+            return false
         }
     }
 
     async function login(credentials) {
+        loading.value = true
         try {
             const response = await axios.post('/auth/login', credentials)
             setAuth(response.data.user, response.data.token)
             return response.data
         } catch (error) {
             throw error.response?.data || { message: 'Error de conexión' }
+        } finally {
+            loading.value = false
         }
     }
 
     async function register(userData) {
+        loading.value = true
         try {
             const response = await axios.post('/auth/register', userData)
             setAuth(response.data.user, response.data.token)
             return response.data
         } catch (error) {
             throw error.response?.data || { message: 'Error de conexión' }
+        } finally {
+            loading.value = false
         }
     }
 
@@ -60,6 +87,7 @@ export const useAuthStore = defineStore('auth', () => {
     return {
         user,
         token,
+        loading,
         isAuthenticated,
         isAdmin,
         login,
