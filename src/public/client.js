@@ -1,4 +1,4 @@
-// src/public/client.js
+
 const apiBase = '/api';
 
 async function fetchProducts() {
@@ -10,6 +10,6 @@ async function fetchProducts() {
 
 fetchProducts();
 
-// Helper para guardar token
+
 function saveToken(t) { localStorage.setItem('token', t); }
 function getToken() { return localStorage.getItem('token'); }

@@ -126,7 +126,7 @@ const loading = ref(false)
 const error = ref(null)
 
 const form = ref({
-    name: '',
+    title: '',
     description: '',
     price: 0,
     stock: 0
@@ -144,7 +144,7 @@ function openModal(product = null) {
     if (product) {
         editingProduct.value = product
         form.value = {
-            name: product.title,
+            title: product.title,
             description: product.description || '',
             price: product.price,
             stock: product.stock
@@ -152,7 +152,7 @@ function openModal(product = null) {
     } else {
         editingProduct.value = null
         form.value = {
-            name: '',
+            title: '',
             description: '',
             price: 0,
             stock: 0

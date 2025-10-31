@@ -37,13 +37,6 @@
                     <h3>Chat</h3>
                     <p>Comunícate con otros jugadores</p>
                 </div>
-
-                <div class="nav-card" v-if="authStore.isAdmin">
-                    <div class="nav-card-icon">⚙️</div>
-                    <h3>Administración</h3>
-                    <p>Panel de control admin</p>
-                    <span class="admin-badge">Solo Admin</span>
-                </div>
             </div>
         </div>
     </div>

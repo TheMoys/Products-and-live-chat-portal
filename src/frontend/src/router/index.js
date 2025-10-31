@@ -24,12 +24,12 @@ const router = createRouter({
             component: () => import('@/views/ProductsView.vue'),
             meta: { requiresAuth: true }
         },
-        // {
-        //     path: '/chat',
-        //     name: 'chat',
-        //     component: () => import('@/views/ChatView.vue'),
-        //     meta: { requiresAuth: true }
-        // }
+        {
+            path: '/chat',
+            name: 'chat',
+            component: () => import('@/views/ChatView.vue'),
+            meta: { requiresAuth: true }
+        }
     ]
 })
 
