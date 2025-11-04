@@ -57,7 +57,7 @@ export const useProductStore = defineStore('products', () => {
         loading.value = true
         error.value = null
         try {
-            await productService.delete(id)
+            await productService.deleteProduct(id)
             products.value = products.value.filter(p => p._id !== id)
         } catch (err) {
             error.value = err.response?.data?.message || 'Error al eliminar producto'
