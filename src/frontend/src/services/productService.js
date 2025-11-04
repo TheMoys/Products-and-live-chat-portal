@@ -1,27 +1,36 @@
 import axios from './axios'
 
 export const productService = {
-    async getAll() {
+    async getAllProducts() {
         const response = await axios.get('/products')
         return response.data
     },
 
-    async getById(id) {
-        const response = await axios.get(`/products/${id}`)
+    async createProduct(productData) {
+        const response = await axios.post('/products', {
+            title: productData.title,
+            description: productData.description || '',
+            price: productData.price,
+            stock: productData.stock,
+            imageUrl: productData.imageUrl || null,
+            imageData: productData.imageData || null
+        })
         return response.data
     },
 
-    async create(productData) {
-        const response = await axios.post('/products', productData)
+    async updateProduct(id, productData) {
+        const response = await axios.put(`/products/${id}`, {
+            title: productData.title,
+            description: productData.description || '',
+            price: productData.price,
+            stock: productData.stock,
+            imageUrl: productData.imageUrl || null,
+            imageData: productData.imageData || null
+        })
         return response.data
     },
 
-    async update(id, productData) {
-        const response = await axios.put(`/products/${id}`, productData)
-        return response.data
-    },
-
-    async delete(id) {
+    async deleteProduct(id) {
         const response = await axios.delete(`/products/${id}`)
         return response.data
     }

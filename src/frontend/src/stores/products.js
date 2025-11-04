@@ -11,7 +11,7 @@ export const useProductStore = defineStore('products', () => {
         loading.value = true
         error.value = null
         try {
-            products.value = await productService.getAll()
+            products.value = await productService.getAllProducts()
         } catch (err) {
             error.value = err.response?.data?.message || 'Error al cargar productos'
             throw err
@@ -24,7 +24,7 @@ export const useProductStore = defineStore('products', () => {
         loading.value = true
         error.value = null
         try {
-            const newProduct = await productService.create(productData)
+            const newProduct = await productService.createProduct(productData)
             products.value.push(newProduct)
             return newProduct
         } catch (err) {
@@ -39,7 +39,7 @@ export const useProductStore = defineStore('products', () => {
         loading.value = true
         error.value = null
         try {
-            const updated = await productService.update(id, productData)
+            const updated = await productService.updateProduct(id, productData)
             const index = products.value.findIndex(p => p._id === id)
             if (index !== -1) {
                 products.value[index] = updated
