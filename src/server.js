@@ -1,4 +1,3 @@
-// src/server.js
 const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');
@@ -8,6 +7,7 @@ const path = require('path');
 
 const { PORT, MONGODB_URI } = require('./config');
 
+const Message = require('./models/Message');
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const chatRoutes = require('./routes/chatRoutes');
@@ -45,28 +45,49 @@ io.use(async (socket, next) => {
 });
 
 io.on('connection', (socket) => {
-    const user = socket.user; // asignado en verifySocketJWT
-    console.log(`Usuario conectado: ${user.username} (${user._id})`);
+    const user = socket.user;
 
-    socket.on('chat:message', (msg) => {
-        // msg: { text }
-        const payload = { user: { id: user._id, username: user.username }, text: msg.text, createdAt: new Date() };
-        io.emit('chat:message', payload);
+    socket.on('chat:message', async (msg) => {
+        try {
+
+            // Guardar mensaje en MongoDB
+            const message = new Message({
+                user: user._id,
+                username: user.username,
+                text: msg.text
+            });
+
+            await message.save();
+
+            // Emitir mensaje a todos los clientes
+            const payload = {
+                _id: message._id,
+                user: {
+                    id: user._id.toString(),      // ⭐ Como string
+                    _id: user._id.toString(),     // ⭐ Ambos formatos
+                    username: user.username
+                },
+                text: message.text,
+                createdAt: message.createdAt
+            };
+
+            io.emit('chat:message', payload);
+        } catch (error) {
+            socket.emit('chat:error', { message: 'Error al enviar mensaje' });
+        }
     });
 
     socket.on('disconnect', () => {
-        console.log(`Usuario desconectado: ${user.username}`);
+        console.log(`❌ Usuario desconectado: ${user.username}`);
     });
 });
 
 // Conexión a MongoDB y arranque del servidor
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
-        console.log('MongoDB conectado');
         server.listen(PORT, () => console.log(`Servidor en puerto ${PORT}`));
     })
     .catch(err => {
-        console.error('Error al conectar a MongoDB', err);
         process.exit(1);
     });
 

@@ -1,71 +1,61 @@
-<!-- filepath: src/frontend/src/views/ChatView.vue -->
 <template>
     <div class="chat-container">
         <header class="chat-header">
-            <h1>💬 CHAT GLOBAL</h1>
-            <div class="header-actions">
-                <button @click="goBack" class="btn-back">← Volver</button>
+            <button @click="goBack" class="btn-back">← Volver</button>
+            <h1>💬 CHAT EN VIVO</h1>
+            <div class="connection-status" :class="{ connected }">
+                <span class="status-dot"></span>
+                {{ connected ? 'Conectado' : 'Desconectado' }}
             </div>
         </header>
 
         <div class="chat-content">
-            <!-- Sidebar de usuarios online -->
             <aside class="chat-sidebar">
-                <div class="sidebar-header">
-                    <span :class="['status-dot', { connected: connected }]"></span>
-                    {{ connected ? 'Conectado' : 'Desconectado' }}
-                </div>
-                <div class="users-list">
-                    <div class="user-item">
-                        <div class="user-avatar">{{ getInitials(authStore.user?.username || 'U') }}</div>
-                        <div class="user-info">
-                            <div class="user-name">{{ authStore.user?.username }}</div>
-                            <div class="user-status">
-                                <span class="status-dot connected"></span>
-                                Tú
-                            </div>
-                        </div>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        {{ getInitials(authStore.username) }}
+                    </div>
+                    <div class="user-details">
+                        <h3>{{ authStore.username }}</h3>
+                        <p>{{ authStore.user?.email }}</p>
                     </div>
                 </div>
             </aside>
 
-            <!-- Área principal del chat -->
             <main class="chat-main">
-                <!-- Mensajes -->
-                <div class="chat-messages" ref="messagesContainer">
-                    <div v-if="messages.length === 0" class="empty-chat">
-                        <div class="empty-chat-icon">💬</div>
-                        <h3>¡Comienza la conversación!</h3>
-                        <p>Sé el primero en enviar un mensaje</p>
-                    </div>
+                <div v-if="chatStore.loading" class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Cargando mensajes...</p>
+                </div>
 
-                    <div v-for="(message, index) in messages" :key="index"
-                        :class="['message', { own: message.user.id === authStore.user?._id }]">
-                        <div class="message-avatar">
-                            {{ getInitials(message.user.username) }}
-                        </div>
-                        <div class="message-content">
-                            <div class="message-header">
-                                <span class="message-sender">{{ message.user.username }}</span>
-                                <span class="message-time">{{ formatTime(message.createdAt) }}</span>
+                <div v-else class="chat-messages" ref="messagesContainer">
+                    <div v-for="(message, index) in messages" :key="message._id || index"
+                        :class="['message-wrapper', { 'own-message': isOwnMessage(message) }]">
+                        <div class="message">
+                            <div class="message-avatar">
+                                {{ getInitials(message.user?.username || message.username) }}
                             </div>
-                            <div class="message-bubble">
-                                {{ message.text }}
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-username">
+                                        {{ message.user?.username || message.username }}
+                                    </span>
+                                    <span class="message-time">
+                                        {{ formatTime(message.createdAt) }}
+                                    </span>
+                                </div>
+                                <div class="message-text">{{ message.text }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Input de mensaje -->
                 <div class="chat-input-container">
-                    <form @submit.prevent="sendMessage" class="chat-input-form">
-                        <input type="text" v-model="newMessage" placeholder="Escribe un mensaje..." class="chat-input"
-                            :disabled="!connected" />
-                        <button type="submit" class="btn-send" :disabled="!newMessage.trim() || !connected">
-                            <span>Enviar</span>
-                            <span>🚀</span>
-                        </button>
-                    </form>
+                    <input v-model="newMessage" @keyup.enter="sendMessage" type="text" class="chat-input"
+                        placeholder="Escribe un mensaje..." maxlength="500" :disabled="!connected" />
+                    <button @click="sendMessage" class="send-button" :disabled="!newMessage.trim() || !connected">
+                        📤
+                    </button>
                 </div>
             </main>
         </div>
@@ -73,45 +63,51 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useChatStore } from '@/stores/chat'
 import { useSocket } from '@/services/socketService'
 import '@/assets/styles/chat.css'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const { connected, initSocket, sendMessage: emitMessage, onMessage, offMessage, disconnect } = useSocket()
+const chatStore = useChatStore()
 
-const messages = ref([])
+const { socket, connected, initSocket, sendMessage: emitMessage, onMessage, offMessage, disconnect } = useSocket()
+
 const newMessage = ref('')
 const messagesContainer = ref(null)
 
-onMounted(() => {
-    // Inicializar socket con el token
-    const token = localStorage.getItem('token')
-    if (token) {
-        initSocket(token)
+// Usar mensajes del store
+const messages = computed(() => chatStore.messages)
 
-        // Escuchar mensajes entrantes
-        onMessage((message) => {
-            console.log('Mensaje recibido:', message)
-            messages.value.push(message)
-            scrollToBottom()
-        })
-    } else {
-        router.push('/login')
-    }
+onMounted(async () => {
+
+    // Cargar historial de mensajes
+    await chatStore.loadMessages()
+    scrollToBottom()
+
+    // Conectar Socket.IO
+    initSocket(authStore.token)
+
+    // Escuchar nuevos mensajes
+    onMessage((message) => {
+        chatStore.addMessage(message)
+        scrollToBottom()
+    })
 })
 
 onUnmounted(() => {
     offMessage()
+    disconnect()
 })
 
 function sendMessage() {
-    if (!newMessage.value.trim() || !connected.value) return
+    const text = newMessage.value.trim()
+    if (!text) return
 
-    emitMessage(newMessage.value)
+    emitMessage(text)
     newMessage.value = ''
 }
 
@@ -123,27 +119,34 @@ function scrollToBottom() {
     })
 }
 
+// Obtener iniciales del nombre de usuario
 function getInitials(username) {
     if (!username) return 'U'
-    return username
-        .split(' ')
-        .map(word => word[0])
-        .join('')
-        .toUpperCase()
-        .substring(0, 2)
+    const parts = username.split(' ')
+    if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase()
+    }
+    return username.substring(0, 2).toUpperCase()
 }
 
-function formatTime(timestamp) {
-    const date = new Date(timestamp)
-    return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+// Formatear hora del mensaje
+function formatTime(date) {
+    if (!date) return ''
+    const d = new Date(date)
+    const hours = d.getHours().toString().padStart(2, '0')
+    const minutes = d.getMinutes().toString().padStart(2, '0')
+    return `${hours}:${minutes}`
+}
+
+function isOwnMessage(message) {
+    // Comparar el ID del usuario del mensaje con el ID del usuario actual
+    const messageUserId = message.user?.id || message.user?._id || message.user
+    const currentUserId = authStore.user?._id || authStore.user?.id
+
+    return messageUserId === currentUserId
 }
 
 function goBack() {
     router.push('/')
 }
-
-// Auto-scroll cuando llegan mensajes
-watch(messages, () => {
-    scrollToBottom()
-}, { deep: true })
 </script>

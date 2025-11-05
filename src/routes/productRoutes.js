@@ -34,7 +34,6 @@ router.post('/', authenticateJWT, async (req, res) => {
         await product.save();
         res.status(201).json(product);
     } catch (error) {
-        console.log(req.body);
         console.error('Error al crear producto:', error);
         res.status(500).json({ message: 'Error al crear producto', error: error.message });
     }
