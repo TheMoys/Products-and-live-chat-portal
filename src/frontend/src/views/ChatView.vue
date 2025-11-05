@@ -50,9 +50,18 @@
                     </div>
                 </div>
 
+                <div v-if="typingText" class="typing-indicator">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span class="typing-text">{{ typingText }}</span>
+                </div>
+
                 <div class="chat-input-container">
-                    <input v-model="newMessage" @keyup.enter="sendMessage" type="text" class="chat-input"
-                        placeholder="Escribe un mensaje..." maxlength="500" :disabled="!connected" />
+                    <input v-model="newMessage" @input="handleInput" @keyup.enter="sendMessage" type="text"
+                        class="chat-input" placeholder="Escribe un mensaje..." maxlength="500" :disabled="!connected" />
                     <button @click="sendMessage" class="send-button" :disabled="!newMessage.trim() || !connected">
                         📤
                     </button>
@@ -74,27 +83,61 @@ const router = useRouter()
 const authStore = useAuthStore()
 const chatStore = useChatStore()
 
-const { socket, connected, initSocket, sendMessage: emitMessage, onMessage, offMessage, disconnect } = useSocket()
+const {
+    socket,
+    connected,
+    initSocket,
+    sendMessage: emitMessage,
+    emitTyping,
+    emitStopTyping,
+    onMessage,
+    onUserTyping,
+    onUserStopTyping,
+    offMessage,
+    disconnect
+} = useSocket()
 
 const newMessage = ref('')
 const messagesContainer = ref(null)
+const typingUsers = ref([]) // Usuarios escribiendo
+let typingTimeout = null
 
-// Usar mensajes del store
 const messages = computed(() => chatStore.messages)
+
+// Texto de "escribiendo..."
+const typingText = computed(() => {
+    if (typingUsers.value.length === 0) return ''
+    if (typingUsers.value.length === 1) {
+        return `${typingUsers.value[0]} está escribiendo...`
+    }
+    if (typingUsers.value.length === 2) {
+        return `${typingUsers.value[0]} y ${typingUsers.value[1]} están escribiendo...`
+    }
+    return `${typingUsers.value.length} personas están escribiendo...`
+})
 
 onMounted(async () => {
 
-    // Cargar historial de mensajes
     await chatStore.loadMessages()
     scrollToBottom()
 
-    // Conectar Socket.IO
     initSocket(authStore.token)
 
-    // Escuchar nuevos mensajes
     onMessage((message) => {
         chatStore.addMessage(message)
         scrollToBottom()
+    })
+
+    // Escuchar cuando alguien está escribiendo
+    onUserTyping((data) => {
+        if (!typingUsers.value.includes(data.username)) {
+            typingUsers.value.push(data.username)
+        }
+    })
+
+    // Escuchar cuando alguien dejó de escribir
+    onUserStopTyping((data) => {
+        typingUsers.value = typingUsers.value.filter(u => u !== data.username)
     })
 })
 
@@ -103,9 +146,30 @@ onUnmounted(() => {
     disconnect()
 })
 
+// Manejar cuando el usuario escribe
+function handleInput() {
+    emitTyping()
+
+    // Cancelar timeout anterior
+    if (typingTimeout) {
+        clearTimeout(typingTimeout)
+    }
+
+    // Después de 1 segundo sin escribir, emitir "stop typing"
+    typingTimeout = setTimeout(() => {
+        emitStopTyping()
+    }, 1000)
+}
+
 function sendMessage() {
     const text = newMessage.value.trim()
     if (!text) return
+
+    // Emitir que dejó de escribir
+    emitStopTyping()
+    if (typingTimeout) {
+        clearTimeout(typingTimeout)
+    }
 
     emitMessage(text)
     newMessage.value = ''
@@ -119,7 +183,6 @@ function scrollToBottom() {
     })
 }
 
-// Obtener iniciales del nombre de usuario
 function getInitials(username) {
     if (!username) return 'U'
     const parts = username.split(' ')
@@ -129,7 +192,6 @@ function getInitials(username) {
     return username.substring(0, 2).toUpperCase()
 }
 
-// Formatear hora del mensaje
 function formatTime(date) {
     if (!date) return ''
     const d = new Date(date)
@@ -139,7 +201,6 @@ function formatTime(date) {
 }
 
 function isOwnMessage(message) {
-    // Comparar el ID del usuario del mensaje con el ID del usuario actual
     const messageUserId = message.user?.id || message.user?._id || message.user
     const currentUserId = authStore.user?._id || authStore.user?.id
 

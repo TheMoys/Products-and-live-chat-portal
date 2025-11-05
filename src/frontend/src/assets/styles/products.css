@@ -349,7 +349,7 @@
     gap: var(--spacing-sm);
     padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
     background: rgba(0, 0, 0, 0.3);
-    /* ⭐ Fondo oscuro para botones */
+    /* Fondo oscuro para botones */
 }
 
 .btn-edit,

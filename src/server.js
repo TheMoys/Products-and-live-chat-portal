@@ -47,6 +47,20 @@ io.use(async (socket, next) => {
 io.on('connection', (socket) => {
     const user = socket.user;
 
+    socket.on('chat:typing', () => {
+        socket.broadcast.emit('chat:user-typing', {
+            userId: user._id,
+            username: user.username
+        });
+    });
+
+    socket.on('chat:stop-typing', () => {
+        socket.broadcast.emit('chat:user-stop-typing', {
+            userId: user._id,
+            username: user.username
+        });
+    });
+
     socket.on('chat:message', async (msg) => {
         try {
 
@@ -63,8 +77,8 @@ io.on('connection', (socket) => {
             const payload = {
                 _id: message._id,
                 user: {
-                    id: user._id.toString(),      // ⭐ Como string
-                    _id: user._id.toString(),     // ⭐ Ambos formatos
+                    id: user._id.toString(),
+                    _id: user._id.toString(),
                     username: user.username
                 },
                 text: message.text,

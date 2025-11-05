@@ -59,6 +59,30 @@ export function useSocket() {
         }
     }
 
+    const emitTyping = () => {
+        if (socket && connected.value) {
+            socket.emit('chat:typing')
+        }
+    }
+
+    const emitStopTyping = () => {
+        if (socket && connected.value) {
+            socket.emit('chat:stop-typing')
+        }
+    }
+
+    const onUserTyping = (callback) => {
+        if (socket) {
+            socket.on('chat:user-typing', callback)
+        }
+    }
+
+    const onUserStopTyping = (callback) => {
+        if (socket) {
+            socket.on('chat:user-stop-typing', callback)
+        }
+    }
+
     return {
         socket,
         connected,
@@ -66,6 +90,10 @@ export function useSocket() {
         sendMessage,
         onMessage,
         offMessage,
-        disconnect
+        disconnect,
+        emitTyping,
+        emitStopTyping,
+        onUserTyping,
+        onUserStopTyping
     }
 }
