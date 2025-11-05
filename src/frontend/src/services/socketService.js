@@ -4,11 +4,13 @@ import { ref } from 'vue'
 let socket = null
 const connected = ref(false)
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || window.location.origin.replace(':5173', ':3000')
+
 export function useSocket() {
     const initSocket = (token) => {
         if (socket) return socket
 
-        socket = io('http://localhost:3000', {
+        socket = io(BACKEND_URL, {
             auth: {
                 token: token
             }

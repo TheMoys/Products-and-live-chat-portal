@@ -85,7 +85,7 @@ io.on('connection', (socket) => {
 // Conexión a MongoDB y arranque del servidor
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
-        server.listen(PORT, () => console.log(`Servidor en puerto ${PORT}`));
+        server.listen(PORT, '0.0.0.0', () => console.log(`Servidor en puerto ${PORT}`));
     })
     .catch(err => {
         process.exit(1);
