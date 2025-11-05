@@ -17,7 +17,7 @@
                     </div>
                     <div class="user-details">
                         <h3>{{ authStore.username }}</h3>
-                        <p>{{ authStore.user?.email }}</p>
+                        <p>{{ authStore.user?.username }}</p>
                     </div>
                 </div>
             </aside>
