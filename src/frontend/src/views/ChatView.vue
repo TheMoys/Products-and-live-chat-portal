@@ -90,7 +90,7 @@
                     <input v-model="newMessage" @input="handleInput" @keyup.enter="sendMessage" type="text"
                         class="chat-input" placeholder="Escribe un mensaje..." maxlength="500" :disabled="!connected" />
                     <button @click="sendMessage" class="send-button" :disabled="!newMessage.trim() || !connected">
-                        📤
+                        Enviar
                     </button>
                 </div>
             </main>
@@ -104,7 +104,6 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useChatStore } from '@/stores/chat'
 import { useSocket } from '@/services/socketService'
-import '@/assets/styles/chat.css'
 
 const router = useRouter()
 const authStore = useAuthStore()

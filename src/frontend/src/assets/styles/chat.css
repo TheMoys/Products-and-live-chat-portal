@@ -47,6 +47,26 @@
     margin: 0;
 }
 
+.btn-back {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.1), rgba(0, 243, 255, 0.05));
+    color: var(--neon-blue);
+    border: 2px solid var(--neon-blue);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+}
+
+.btn-back:hover {
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(0, 243, 255, 0.1));
+    box-shadow: 0 0 30px rgba(0, 243, 255, 0.4);
+    transform: translateY(-2px);
+}
+
 .connection-status {
     display: flex;
     align-items: center;
