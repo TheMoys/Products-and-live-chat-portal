@@ -4,6 +4,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+src/frontend/node_modules/
+src/frontend/dist/
 
 # Archivos de entorno
 .env
