@@ -67,10 +67,15 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    async function register(userData) {
+    async function register(username, email, password, adminCode = '') {
         loading.value = true
         try {
-            const response = await axios.post('/auth/register', userData)
+            const response = await axios.post('/auth/register', {
+                username,
+                email,
+                password,
+                adminCode: adminCode || undefined
+            })
             setAuth(response.data.user, response.data.token)
             return response.data
         } catch (error) {

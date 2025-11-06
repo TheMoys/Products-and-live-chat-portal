@@ -26,11 +26,12 @@
                 </div>
 
                 <div class="input-group">
-                    <label for="role">Tipo de Cuenta</label>
-                    <select id="role" v-model="form.role">
-                        <option value="user">Usuario</option>
-                        <option value="admin">Administrador</option>
-                    </select>
+                    <label for="adminCode">Código de Administrador (Opcional)</label>
+                    <input type="password" id="adminCode" v-model="form.adminCode"
+                        placeholder="Déjalo vacío para cuenta de usuario" autocomplete="off" />
+                    <small class="input-hint">
+                        💡 Si tienes un código de administrador, ingrésalo aquí
+                    </small>
                 </div>
 
                 <div v-if="error" class="error-message">
@@ -66,7 +67,7 @@ const form = ref({
     username: '',
     email: '',
     password: '',
-    role: 'user'
+    adminCode: ''
 })
 
 const loading = ref(false)
@@ -77,7 +78,12 @@ async function handleRegister() {
     error.value = null
 
     try {
-        await authStore.register(form.value)
+        await authStore.register(
+            form.value.username,
+            form.value.email,
+            form.value.password,
+            form.value.adminCode
+        )
         router.push('/')
     } catch (err) {
         error.value = err.message || 'Error al registrarse'

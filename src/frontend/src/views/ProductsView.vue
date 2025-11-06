@@ -157,7 +157,7 @@ const editingProduct = ref(null)
 const loading = ref(false)
 const error = ref(null)
 const imageError = ref(false)
-const imageMode = ref('upload') // 'upload' o 'url'
+const imageMode = ref('upload')
 const imagePreview = ref(null)
 const fileInput = ref(null)
 

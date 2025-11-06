@@ -126,7 +126,7 @@ const {
 
 const newMessage = ref('')
 const messagesContainer = ref(null)
-const typingUsers = ref([]) // Usuarios escribiendo
+const typingUsers = ref([])
 let typingTimeout = null
 const connectedUsers = ref([])
 
