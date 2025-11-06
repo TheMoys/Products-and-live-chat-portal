@@ -3,7 +3,7 @@
     <div class="auth-container">
         <div class="auth-card">
             <div class="logo-section">
-                <h1 class="glitch">UNEAT</h1>
+                <h1 class="glitch">Arcane Archives</h1>
                 <p class="subtitle">GAMING PORTAL</p>
             </div>
 

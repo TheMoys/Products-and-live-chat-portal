@@ -83,6 +83,12 @@ export function useSocket() {
         }
     }
 
+    const onUsersUpdate = (callback) => {
+    if (socket) {
+        socket.on('chat:users-update', callback)
+    }
+}
+
     return {
         socket,
         connected,
@@ -94,6 +100,7 @@ export function useSocket() {
         emitTyping,
         emitStopTyping,
         onUserTyping,
-        onUserStopTyping
+        onUserStopTyping,
+        onUsersUpdate
     }
 }

@@ -8,6 +8,7 @@ const path = require('path');
 const { PORT, MONGODB_URI } = require('./config');
 
 const Message = require('./models/Message');
+const connectedUsers = new Map();
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const chatRoutes = require('./routes/chatRoutes');
@@ -46,6 +47,13 @@ io.use(async (socket, next) => {
 
 io.on('connection', (socket) => {
     const user = socket.user;
+
+    connectedUsers.set(user._id.toString(), {
+        userId: user._id.toString(),
+        username: user.username,
+        socketId: socket.id
+    });
+    io.emit('chat:users-update', Array.from(connectedUsers.values()));
 
     socket.on('chat:typing', () => {
         socket.broadcast.emit('chat:user-typing', {
@@ -93,6 +101,9 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log(`❌ Usuario desconectado: ${user.username}`);
+
+        connectedUsers.delete(user._id.toString());
+        io.emit('chat:users-update', Array.from(connectedUsers.values()));
     });
 });
 

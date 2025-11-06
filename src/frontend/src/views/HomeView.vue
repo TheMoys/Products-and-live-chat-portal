@@ -3,7 +3,7 @@
     <div class="home-container">
         <nav class="navbar">
             <div class="navbar-brand">
-                <h1>UNEAT</h1>
+                <h1>Arcane Archives</h1>
             </div>
             <div class="user-info">
                 <div class="user-badge">
@@ -21,7 +21,7 @@
         <div class="home-content">
             <section class="welcome-section">
                 <h2>Bienvenido, {{ authStore.user?.username }}!</h2>
-                <p>Portal de gestión gaming UNEAT</p>
+                <p>Portal de gestión gaming</p>
             </section>
 
             <div class="navigation-grid">

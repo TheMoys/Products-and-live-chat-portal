@@ -20,6 +20,33 @@
                         <p>{{ authStore.user?.username }}</p>
                     </div>
                 </div>
+
+                <div class="connected-users">
+                    <h3 class="users-title">
+                        👥 Conectados ({{ connectedUsers.length }})
+                    </h3>
+
+                    <div class="users-list">
+                        <div v-for="user in connectedUsers" :key="user.userId"
+                            :class="['user-item', { 'current-user': user.username === authStore.username }]">
+                            <div class="user-item-avatar">
+                                {{ getInitials(user.username) }}
+                            </div>
+                            <div class="user-item-info">
+                                <span class="user-item-name">
+                                    {{ user.username }}
+                                    <span v-if="user.username === authStore.username" class="you-badge">Tú</span>
+                                </span>
+                                <span class="user-item-status">En línea</span>
+                            </div>
+                            <div class="status-indicator"></div>
+                        </div>
+
+                        <div v-if="connectedUsers.length === 0" class="no-users">
+                            <p>No hay usuarios conectados</p>
+                        </div>
+                    </div>
+                </div>
             </aside>
 
             <main class="chat-main">
@@ -93,6 +120,7 @@ const {
     onMessage,
     onUserTyping,
     onUserStopTyping,
+    onUsersUpdate,
     offMessage,
     disconnect
 } = useSocket()
@@ -101,6 +129,7 @@ const newMessage = ref('')
 const messagesContainer = ref(null)
 const typingUsers = ref([]) // Usuarios escribiendo
 let typingTimeout = null
+const connectedUsers = ref([])
 
 const messages = computed(() => chatStore.messages)
 
@@ -138,6 +167,11 @@ onMounted(async () => {
     // Escuchar cuando alguien dejó de escribir
     onUserStopTyping((data) => {
         typingUsers.value = typingUsers.value.filter(u => u !== data.username)
+    })
+
+    onUsersUpdate((users) => {
+        console.log('👥 Usuarios conectados:', users)
+        connectedUsers.value = users
     })
 })
 
