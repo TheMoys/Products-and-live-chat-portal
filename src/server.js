@@ -28,12 +28,37 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
+// Servir archivos estáticos del frontend en producción
+if (process.env.NODE_ENV === 'production') {
+  const frontendPath = path.join(__dirname, '../dist');
+  console.log('📂 Sirviendo frontend desde:', frontendPath);
+  app.use(express.static(frontendPath));
+}
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    port: PORT
+  });
+});
+
+// Routes API
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/chat', chatRoutes);
+
+// Servir index.html para todas las demás rutas (SPA)
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/socket.io')) {
+      res.sendFile(path.join(__dirname, '../dist/index.html'));
+    }
+  });
+}
 
 // Socket.IO: comprobar JWT en la conexión
 io.use(async (socket, next) => {
@@ -41,12 +66,14 @@ io.use(async (socket, next) => {
         await verifySocketJWT(socket);
         next();
     } catch (err) {
+        console.error('❌ Socket auth error:', err.message);
         next(new Error('Unauthorized socket'));
     }
 });
 
 io.on('connection', (socket) => {
     const user = socket.user;
+    console.log(`✅ Usuario conectado: ${user.username} (${socket.id})`);
 
     connectedUsers.set(user._id.toString(), {
         userId: user._id.toString(),
@@ -71,8 +98,6 @@ io.on('connection', (socket) => {
 
     socket.on('chat:message', async (msg) => {
         try {
-
-            // Guardar mensaje en MongoDB
             const message = new Message({
                 user: user._id,
                 username: user.username,
@@ -81,7 +106,6 @@ io.on('connection', (socket) => {
 
             await message.save();
 
-            // Emitir mensaje a todos los clientes
             const payload = {
                 _id: message._id,
                 user: {
@@ -95,28 +119,36 @@ io.on('connection', (socket) => {
 
             io.emit('chat:message', payload);
         } catch (error) {
+            console.error('❌ Error al guardar mensaje:', error);
             socket.emit('chat:error', { message: 'Error al enviar mensaje' });
         }
     });
 
     socket.on('disconnect', () => {
         console.log(`❌ Usuario desconectado: ${user.username}`);
-
         connectedUsers.delete(user._id.toString());
         io.emit('chat:users-update', Array.from(connectedUsers.values()));
     });
 });
 
 // Conexión a MongoDB y arranque del servidor
-mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+console.log('🔄 Conectando a MongoDB...');
+console.log('📍 MONGODB_URI:', MONGODB_URI ? 'Configurado ✅' : 'NO configurado ❌');
+console.log('📍 PORT:', PORT);
+console.log('📍 NODE_ENV:', process.env.NODE_ENV);
+
+mongoose.connect(MONGODB_URI)
     .then(() => {
-        server.listen(PORT, '0.0.0.0', () => console.log(`Servidor en puerto ${PORT}`));
+        console.log('✅ Conectado a MongoDB exitosamente');
+        server.listen(PORT, '0.0.0.0', () => {
+            console.log(`🚀 Servidor corriendo en http://0.0.0.0:${PORT}`);
+            console.log(`🌍 Entorno: ${process.env.NODE_ENV || 'development'}`);
+        });
     })
     .catch(err => {
         console.error('❌ Error fatal al conectar a MongoDB:');
         console.error('Error:', err.message);
         console.error('Stack:', err.stack);
-        console.error('MONGODB_URI utilizado:', MONGODB_URI);
         process.exit(1);
     });
 
