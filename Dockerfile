@@ -2,19 +2,26 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copiar package.json e instalar TODAS las dependencias
+# Copiar package.json
 COPY package*.json ./
+
+# Instalar dependencias del backend
 RUN npm install
 
-# Copiar todo el código fuente
+# Copiar código fuente (SIN .env)
 COPY src/ ./src/
-COPY .env ./
 COPY vite.config.js ./
 
-# Crear carpeta uploads
-RUN mkdir -p uploads
+# Instalar dependencias del frontend y construir
+WORKDIR /app/src/frontend
+RUN npm install
+RUN npm run build
 
-EXPOSE 3000 5173
+# Volver a la raíz
+WORKDIR /app
 
-# Iniciar con el script dev que ya tienes configurado
-CMD ["npm", "run", "dev"]
+# Exponer puerto
+EXPOSE 3000
+
+# Comando para iniciar
+CMD ["node", "src/server.js"]
