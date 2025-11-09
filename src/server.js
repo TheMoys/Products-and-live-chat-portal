@@ -113,6 +113,10 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true 
         server.listen(PORT, '0.0.0.0', () => console.log(`Servidor en puerto ${PORT}`));
     })
     .catch(err => {
+        console.error('❌ Error fatal al conectar a MongoDB:');
+        console.error('Error:', err.message);
+        console.error('Stack:', err.stack);
+        console.error('MONGODB_URI utilizado:', MONGODB_URI);
         process.exit(1);
     });
 
