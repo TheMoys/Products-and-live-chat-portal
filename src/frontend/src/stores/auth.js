@@ -85,8 +85,25 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    function logout() {
-        clearAuth()
+    async function logout() {
+        try {
+            localStorage.removeItem('token');
+            user.value = null;
+            token.value = null;
+
+            // Limpiar otros stores
+            const cartStore = useCartStore();
+            const ordersStore = useOrdersStore();
+            const usersStore = useUsersStore();
+
+            cartStore.resetCart();
+            ordersStore.resetOrders();
+            usersStore.resetUsers();
+
+            router.push('/login');
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
     }
 
     return {
