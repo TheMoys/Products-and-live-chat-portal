@@ -1,20 +1,18 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Copiar package.json e instalar TODAS las dependencias
+# Copiar package.json y package-lock.json
 COPY package*.json ./
-RUN npm install
 
-# Copiar todo el código fuente
-COPY src/ ./src/
-COPY .env ./
-COPY vite.config.js ./
+# Instalar dependencias
+RUN npm ci
 
-# Crear carpeta uploads
-RUN mkdir -p uploads
+# Copiar el resto del código
+COPY . .
 
+# Exponer puertos
 EXPOSE 3000 5173
 
-# Iniciar con el script dev que ya tienes configurado
+# Usar el script "dev" de tu package.json
 CMD ["npm", "run", "dev"]

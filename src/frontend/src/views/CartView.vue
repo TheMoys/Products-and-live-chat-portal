@@ -88,7 +88,7 @@ const getProductImage = (product) => {
         <div class="cart-items">
           <div 
             v-for="item in cartStore.cart.items" 
-            :key="item.product._id"
+            :key="item.product.id"
             class="cart-item"
           >
             <div class="item-image">
@@ -114,7 +114,7 @@ const getProductImage = (product) => {
 
             <div class="item-quantity">
               <button 
-                @click="handleUpdateQuantity(item.product._id, item.quantity - 1)"
+                @click="handleUpdateQuantity(item.product.id, item.quantity - 1)"
                 :disabled="item.quantity <= 1"
                 class="qty-btn"
               >
@@ -123,13 +123,13 @@ const getProductImage = (product) => {
               <input 
                 type="number" 
                 :value="item.quantity"
-                @change="handleUpdateQuantity(item.product._id, parseInt($event.target.value))"
+                @change="handleUpdateQuantity(item.product.id, parseInt($event.target.value))"
                 min="1"
                 :max="item.product.stock"
                 class="qty-input"
               >
               <button 
-                @click="handleUpdateQuantity(item.product._id, item.quantity + 1)"
+                @click="handleUpdateQuantity(item.product.id, item.quantity + 1)"
                 :disabled="item.quantity >= item.product.stock"
                 class="qty-btn"
               >
@@ -143,7 +143,7 @@ const getProductImage = (product) => {
             </div>
 
             <button 
-              @click="handleRemoveItem(item.product._id)"
+              @click="handleRemoveItem(item.product.id)"
               class="btn-remove"
               title="Eliminar"
             >

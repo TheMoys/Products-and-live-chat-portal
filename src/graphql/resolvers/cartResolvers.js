@@ -3,7 +3,7 @@ const Product = require('../../models/Products');
 
 const cartResolvers = {
   Query: {
-    myCart: async (_, __, { user }) => {
+    getCart: async (_, __, { user }) => {
       if (!user) throw new Error('No autenticado');
       
       let cart = await Cart.findOne({ user: user._id })
@@ -11,7 +11,11 @@ const cartResolvers = {
         .populate('user');
       
       if (!cart) {
-        cart = new Cart({ user: user._id, items: [] });
+        cart = new Cart({ 
+          user: user._id, 
+          items: [],
+          totalAmount: 0  // ✅ Inicializar totalAmount
+        });
         await cart.save();
         await cart.populate('user');
       }
@@ -38,6 +42,10 @@ const cartResolvers = {
       } else {
         cart.items.push({ product: productId, quantity, price: product.price });
       }
+
+      cart.totalAmount = cart.items.reduce((total, item) => {
+        return total + (item.price * item.quantity);
+      }, 0);
       
       await cart.save();
       await cart.populate('items.product user');
@@ -54,6 +62,11 @@ const cartResolvers = {
       if (!item) throw new Error('Producto no encontrado en carrito');
       
       item.quantity = quantity;
+
+      cart.totalAmount = cart.items.reduce((total, item) => {
+        return total + (item.price * item.quantity);
+      }, 0);
+
       await cart.save();
       await cart.populate('items.product user');
       return cart;
@@ -66,6 +79,11 @@ const cartResolvers = {
       if (!cart) throw new Error('Carrito no encontrado');
       
       cart.items = cart.items.filter(i => i.product.toString() !== productId);
+
+      cart.totalAmount = cart.items.reduce((total, item) => {
+        return total + (item.price * item.quantity);
+      }, 0);
+
       await cart.save();
       await cart.populate('items.product user');
       return cart;
@@ -74,12 +92,24 @@ const cartResolvers = {
     clearCart: async (_, __, { user }) => {
       if (!user) throw new Error('No autenticado');
       
-      const cart = await Cart.findOne({ user: user._id });
-      if (cart) {
+      let cart = await Cart.findOne({ user: user._id });
+      
+      if (!cart) {
+        cart = new Cart({ 
+          user: user._id, 
+          items: [],
+          totalAmount: 0
+        });
+        await cart.save();
+      } else {
         cart.items = [];
+        cart.totalAmount = 0; // ✅ Resetear totalAmount
         await cart.save();
       }
-      return true;
+      
+      await cart.populate('items.product user');
+      
+      return cart;
     }
   }
 };

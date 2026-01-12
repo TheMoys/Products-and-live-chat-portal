@@ -16,7 +16,8 @@ const typeDefs = gql`
     price: Float!
     category: String!
     stock: Int!
-    image: String
+    imageUrl: String
+    imageData: String
     createdAt: String!
   }
 
@@ -31,6 +32,7 @@ const typeDefs = gql`
     user: User!
     items: [CartItem!]!
     updatedAt: String!
+    totalAmount: Float
   }
 
   type OrderItem {
@@ -82,7 +84,7 @@ const typeDefs = gql`
     product(id: ID!): Product
     
     # Carrito
-    myCart: Cart
+    getCart: Cart
     
     # Pedidos
     myOrders: [Order!]!

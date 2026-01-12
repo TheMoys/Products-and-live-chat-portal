@@ -1,31 +1,65 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
+const GRAPHQL_ENDPOINT = import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:3000/graphql';
 
-const httpLink = createHttpLink({
-  uri: 'http://localhost:3000/graphql',
-});
+console.log('🔗 GraphQL Endpoint:', GRAPHQL_ENDPOINT);
 
-const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem('token');
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : '',
+const graphqlClient = {
+  async request(query, variables = {}) {
+    const token = localStorage.getItem('token');
+    
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
-  };
-});
-
-const client = new ApolloClient({
-  link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
-  defaultOptions: {
-    watchQuery: {
-      fetchPolicy: 'network-only',
-    },
-    query: {
-      fetchPolicy: 'network-only',
-    },
+    
+    console.log('📤 GraphQL Request:', { 
+      endpoint: GRAPHQL_ENDPOINT, 
+      hasToken: !!token,
+      variables,
+      query: query.substring(0, 150) + '...'
+    });
+    
+    try {
+      const response = await fetch(GRAPHQL_ENDPOINT, {
+        method: 'POST',
+        headers,
+        credentials: 'include',
+        body: JSON.stringify({
+          query,
+          variables
+        })
+      });
+      
+      console.log('📥 Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      });
+      
+      const result = await response.json();
+      console.log('📦 Result:', result);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${result.errors?.[0]?.message || response.statusText}`);
+      }
+      
+      if (result.errors) {
+        console.error('❌ GraphQL Errors:', result.errors);
+        throw new Error(result.errors[0]?.message || 'GraphQL Error');
+      }
+      
+      return result.data;
+    } catch (error) {
+      console.error('💥 GraphQL Request Error:', error);
+      throw error;
+    }
   },
-});
 
-export default client;
+  async requestWithAuth(query, variables = {}) {
+    return this.request(query, variables);
+  }
+};
+
+export default graphqlClient;

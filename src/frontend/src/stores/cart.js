@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { cartService } from '@/services/cartService';
+import cartService from '@/services/cartService';
 
 export const useCartStore = defineStore('cart', () => {
   // State
@@ -44,7 +44,7 @@ export const useCartStore = defineStore('cart', () => {
     loading.value = true;
     error.value = null;
     try {
-      cart.value = await cartService.addItem(productId, quantity);
+      cart.value = await cartService.addToCart(productId, quantity);
       return { success: true };
     } catch (err) {
       error.value = err.message || 'Error al agregar producto';
@@ -56,6 +56,7 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   async function updateItem(productId, quantity) {
+    console.log('Updating item:', productId, 'to quantity:', quantity);
     if (quantity < 1) {
       return await removeItem(productId);
     }
@@ -63,7 +64,7 @@ export const useCartStore = defineStore('cart', () => {
     loading.value = true;
     error.value = null;
     try {
-      cart.value = await cartService.updateItem(productId, quantity);
+      cart.value = await cartService.updateCartItem(productId, quantity);
       return { success: true };
     } catch (err) {
       error.value = err.message || 'Error al actualizar cantidad';
@@ -78,7 +79,7 @@ export const useCartStore = defineStore('cart', () => {
     loading.value = true;
     error.value = null;
     try {
-      cart.value = await cartService.removeItem(productId);
+      cart.value = await cartService.removeFromCart(productId);
       return { success: true };
     } catch (err) {
       error.value = err.message || 'Error al eliminar producto';

@@ -25,18 +25,66 @@ const resolvers = require('./graphql/resolvers');
 const app = express();
 const server = http.createServer(app);
 
-const io = new Server(server, {
-    cors: {
-        origin: '*',
-        methods: ['GET', 'POST']
+// ✅ CORS CONFIGURADO CORRECTAMENTE
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Permitir requests sin origin (como Postman) y localhost
+        const allowedOrigins = [
+            'http://localhost:5173',
+            'http://localhost:3000',
+            'http://127.0.0.1:5173',
+            'http://127.0.0.1:3000'
+        ];
+        
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(null, true); // Permitir todo en desarrollo
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
+// ✅ Aplicar CORS globalmente ANTES de cualquier ruta
+app.use(cors(corsOptions));
+
+app.use((req, res, next) => {
+    if (req.path === '/graphql') {
+        console.log('📊 GraphQL Request:', {
+            method: req.method,
+            path: req.path,
+            origin: req.headers.origin,
+            hasAuth: !!req.headers.authorization,
+            contentType: req.headers['content-type'],
+            body: req.body ? 'presente' : 'ausente'
+        });
     }
+    next();
+});
+
+// ✅ Manejar preflight requests
+app.options('*', cors(corsOptions));
+
+const io = new Server(server, {
+    cors: corsOptions
 });
 
 // Middleware
-app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ✅ Health check (sin autenticación)
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        cors: 'enabled'
+    });
+});
 
 // Routes REST
 app.use('/api/auth', authRoutes);
@@ -59,6 +107,7 @@ const getUser = async (req) => {
             const user = await User.findById(decoded.id);
             return user;
         } catch (error) {
+            console.error('Error al verificar token:', error.message);
             return null;
         }
     }
@@ -66,7 +115,7 @@ const getUser = async (req) => {
     return null;
 };
 
-// Configurar Apollo Server
+// ✅ Configurar Apollo Server con CORS
 async function startApolloServer() {
     const apolloServer = new ApolloServer({
         typeDefs,
@@ -75,17 +124,22 @@ async function startApolloServer() {
             const user = await getUser(req);
             return { user };
         },
-        playground: process.env.GRAPHQL_PLAYGROUND === 'true',
-        introspection: true
+        playground: true, // ✅ Habilitar playground
+        introspection: true,
+        cors: false // ✅ Desactivar CORS de Apollo (usamos Express CORS)
     });
 
     await apolloServer.start();
+    
+    // ✅ Aplicar middleware de Apollo con CORS ya configurado
     apolloServer.applyMiddleware({ 
         app, 
-        path: process.env.GRAPHQL_PATH || '/graphql' 
+        path: '/graphql',
+        cors: false // Express ya maneja CORS
     });
 
     console.log(`🚀 GraphQL disponible en http://localhost:${PORT}${apolloServer.graphqlPath}`);
+    console.log(`🎮 GraphQL Playground: http://localhost:${PORT}${apolloServer.graphqlPath}`);
 }
 
 // Socket.IO
@@ -165,8 +219,9 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true 
         await startApolloServer();
         
         server.listen(PORT, '0.0.0.0', () => {
-            console.log(`✅ Servidor REST en puerto ${PORT}`);
+            console.log(`✅ Servidor REST en http://localhost:${PORT}`);
             console.log(`✅ Socket.IO funcionando`);
+            console.log(`✅ CORS habilitado para: http://localhost:5173`);
         });
     })
     .catch(err => {

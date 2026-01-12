@@ -21,14 +21,11 @@ services:
       - "5173:5173"
     depends_on:
       - mongodb
-    environment:
-      PORT: 3000
-      MONGODB_URI: mongodb://mongodb:27017/portal-productos
-      JWT_SECRET: clave_super_secreta
-      JWT_EXPIRES_IN: 12h
-      ADMIN_CODE: admin1234
+    env_file:
+      - .env
     volumes:
-      - ./uploads:/app/uploads
+      - .:/app                # Montar todo el proyecto
+      - /app/node_modules     # Excluir node_modules
     networks:
       - uneat-network
 

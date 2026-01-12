@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { cartService } from '@/services/cartService';
+import cartService from '@/services/cartService';
 import { orderService } from '@/services/orderService';
 import { userService } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
@@ -92,7 +92,7 @@ const testAddToCart = async () => {
             throw new Error('ID de producto requerido');
         }
 
-        const cart = await cartService.addItem(productId, 1);
+        const cart = await cartService.addToCart(productId, 1);
         console.log('✅ Producto agregado al carrito:', cart);
 
         results.value.addToCart = cart;

@@ -1,75 +1,177 @@
-import axios from 'axios';
+import graphqlClient from './graphqlClient';
 
-const API_URL = 'http://localhost:3000/api/cart';
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-};
-
-export const cartService = {
-  // Obtener carrito del usuario
+const cartService = {
+  // Obtener carrito
   async getCart() {
+    const query = `
+      query GetCart {
+        getCart {
+          id
+          items {
+            product {
+              id
+              title
+              description
+              price
+              imageUrl
+              imageData
+              stock
+            }
+            quantity
+            price
+          }
+          totalAmount
+          updatedAt
+        }
+      }
+    `;
+
     try {
-      const response = await axios.get(API_URL, getAuthHeaders());
-      return response.data;
+      const response = await graphqlClient.request(query);
+      return response.getCart;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Error al obtener carrito:', error);
+      throw error;
     }
   },
 
-  // Agregar producto al carrito
-  async addItem(productId, quantity = 1) {
+  // Añadir producto al carrito
+  async addToCart(productId, quantity = 1) {
+    const mutation = `
+      mutation AddToCart($productId: ID!, $quantity: Int!) {
+        addToCart(productId: $productId, quantity: $quantity) {
+          id
+          items {
+            product {
+              id
+              title
+              description
+              price
+              imageUrl
+              imageData
+              stock
+            }
+            quantity
+            price
+          }
+          totalAmount
+        }
+      }
+    `;
+
     try {
-      const response = await axios.post(
-        `${API_URL}/items`,
-        { productId, quantity },
-        getAuthHeaders()
-      );
-      return response.data;
+      const response = await graphqlClient.request(mutation, {
+        productId,
+        quantity
+      });
+      return response.addToCart;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Error al añadir al carrito:', error);
+      throw error;
     }
   },
 
   // Actualizar cantidad de un producto
-  async updateItem(productId, quantity) {
+  async updateCartItem(productId, quantity) {
+    const mutation = `
+      mutation UpdateCartItem($productId: ID!, $quantity: Int!) {
+        updateCartItem(productId: $productId, quantity: $quantity) {
+          id
+          items {
+            product {
+              id
+              title
+              description
+              price
+              imageUrl
+              imageData
+              stock
+            }
+            quantity
+            price
+          }
+          totalAmount
+        }
+      }
+    `;
+
     try {
-      const response = await axios.put(
-        `${API_URL}/items/${productId}`,
-        { quantity },
-        getAuthHeaders()
-      );
-      return response.data;
+      const response = await graphqlClient.request(mutation, {
+        productId,
+        quantity
+      });
+      return response.updateCartItem;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Error al actualizar carrito:', error);
+      throw error;
     }
   },
 
   // Eliminar producto del carrito
-  async removeItem(productId) {
+  async removeFromCart(productId) {
+    const mutation = `
+      mutation RemoveFromCart($productId: ID!) {
+        removeFromCart(productId: $productId) {
+          id
+          items {
+            product {
+              id
+              title
+              description
+              price
+              imageUrl
+              imageData
+              stock
+            }
+            quantity
+            price
+          }
+          totalAmount
+        }
+      }
+    `;
+
     try {
-      const response = await axios.delete(
-        `${API_URL}/items/${productId}`,
-        getAuthHeaders()
-      );
-      return response.data;
+      const response = await graphqlClient.request(mutation, { productId });
+      return response.removeFromCart;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Error al eliminar del carrito:', error);
+      throw error;
     }
   },
 
   // Vaciar carrito
   async clearCart() {
+    const mutation = `
+      mutation ClearCart {
+        clearCart {
+          id
+          items {
+            product {
+              id
+              title
+              description
+              price
+              imageUrl
+              imageData
+              stock
+            }
+            quantity
+            price
+          }
+          totalAmount
+        }
+      }
+    `;
+
     try {
-      const response = await axios.delete(API_URL, getAuthHeaders());
-      return response.data;
+      const response = await graphqlClient.request(mutation);
+      return response.clearCart;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Error al vaciar carrito:', error);
+      throw error;
     }
-  },
+  }
 };
+
+export default cartService;
