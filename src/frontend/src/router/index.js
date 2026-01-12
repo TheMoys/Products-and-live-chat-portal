@@ -39,7 +39,13 @@ const router = createRouter({
             name: 'TestServices',
             component: () => import('@/views/TestServicesView.vue'),
             meta: { requiresAuth: true } // Requiere autenticación
-        }
+        },
+        {
+            path: '/cart',
+            name: 'cart',
+            component: () => import('@/views/CartView.vue'),
+            meta: { requiresAuth: true }
+        },
     ]
 })
 
