@@ -57,6 +57,28 @@ const graphqlClient = {
     }
   },
 
+  // ✅ Método para mutations (compatible con Apollo Client)
+  async mutate({ mutation, variables = {} }) {
+    // Extraer el string de la query si es un objeto gql
+    const queryString = typeof mutation === 'string' 
+      ? mutation 
+      : mutation.loc?.source?.body || mutation.toString();
+    
+    const data = await this.request(queryString, variables);
+    return { data };
+  },
+
+  // ✅ Método para queries (compatible con Apollo Client)
+  async query({ query, variables = {} }) {
+    // Extraer el string de la query si es un objeto gql
+    const queryString = typeof query === 'string' 
+      ? query 
+      : query.loc?.source?.body || query.toString();
+    
+    const data = await this.request(queryString, variables);
+    return { data };
+  },
+
   async requestWithAuth(query, variables = {}) {
     return this.request(query, variables);
   }

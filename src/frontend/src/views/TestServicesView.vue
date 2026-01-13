@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import cartService from '@/services/cartService';
-import { orderService } from '@/services/orderService';
+import orderService from '@/services/orderService';
 import { userService } from '@/services/userService';
 import { useAuthStore } from '@/stores/auth';
 import { useCartStore } from '@/stores/cart';

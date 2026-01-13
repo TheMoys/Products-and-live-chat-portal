@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { orderService } from '@/services/orderService';
+import orderService from '@/services/orderService';
 
 export const useOrdersStore = defineStore('orders', () => {
   // State
@@ -56,7 +56,7 @@ export const useOrdersStore = defineStore('orders', () => {
     error.value = null;
     try {
       const newOrder = await orderService.createOrder(shippingAddress);
-      orders.value.unshift(newOrder); // Agregar al inicio
+      orders.value.unshift(newOrder);
       return { success: true, order: newOrder };
     } catch (err) {
       error.value = err.message || 'Error al crear pedido';
