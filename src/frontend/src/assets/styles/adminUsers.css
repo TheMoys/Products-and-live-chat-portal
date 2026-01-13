@@ -269,61 +269,7 @@
   box-shadow: var(--shadow-md);
 }
 
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--z-modal);
-}
-
-.modal-content {
-  background: var(--card-bg);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  max-width: 500px;
-  width: 90%;
-  box-shadow: var(--shadow-lg);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-md);
-}
-
-.modal-header h2 {
-  margin: 0;
-  color: var(--text-bright);
-  font-family: var(--font-display);
-}
-
-.modal-close {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 24px;
-  cursor: pointer;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color var(--transition-fast);
-}
-
-.modal-close:hover {
-  color: var(--text-bright);
-}
-
+/* Modal Form */
 .modal-form {
   display: flex;
   flex-direction: column;
@@ -332,10 +278,11 @@
 
 .modal-form label {
   display: block;
-  color: var(--text-primary);
+  color: var(--text-bright);
   font-size: 14px;
   margin-bottom: 6px;
   font-family: var(--font-display);
+  font-weight: 500;
 }
 
 .modal-actions {
