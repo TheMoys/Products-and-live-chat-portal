@@ -1,4 +1,3 @@
-<!-- filepath: src/frontend/src/views/HomeView.vue -->
 <template>
     <div class="home-container">
         <nav class="navbar">
@@ -16,6 +15,9 @@
                     Cerrar Sesión
                 </button>
             </div>
+            <router-link to="/my-orders" class="nav-link">
+                📦 Mis Pedidos
+            </router-link>
         </nav>
 
         <div class="home-content">
