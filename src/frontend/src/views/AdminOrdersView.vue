@@ -97,8 +97,8 @@ const getStatusColor = (status) => {
       
       <!-- Header -->
       <div class="admin-header">
-        <button @click="goBack" class="btn-back">← Volver</button>
         <h1>🛠️ Gestión de Pedidos</h1>
+        <button @click="goBack" class="btn btn-secondary">← Volver</button>
       </div>
 
       <!-- Loading -->

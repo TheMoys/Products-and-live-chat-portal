@@ -1,0 +1,418 @@
+/* ===========================
+   COMPONENTES REUTILIZABLES - STEAM STYLE
+   =========================== */
+
+/* ===== CARDS ===== */
+.card {
+    background: var(--card-bg);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(5px);
+    transition: all var(--transition-normal);
+}
+
+.card:hover {
+    background: var(--card-bg-hover);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+}
+
+/* ===== BOTONES STEAM ===== */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: left var(--transition-normal);
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #06BFFF 0%, #2D73FF 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(90deg, #1fa5d8 0%, #2563e6 100%);
+    box-shadow: 0 0 10px rgba(102, 192, 244, 0.5);
+}
+
+.btn-secondary {
+    background: var(--steam-light);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background: #3e5871;
+}
+
+.btn-success {
+    background: var(--gradient-success);
+    color: white;
+}
+
+.btn-success:hover {
+    background: linear-gradient(90deg, #4d8c26 0%, #3d6e1f 100%);
+}
+
+.btn-danger {
+    background: var(--gradient-danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(90deg, #a13636 0%, #7d2222 100%);
+}
+
+.btn-warning {
+    background: var(--gradient-warning);
+    color: white;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--steam-blue);
+    color: var(--steam-blue);
+}
+
+.btn-outline:hover {
+    background: var(--steam-blue);
+    color: var(--steam-dark);
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.btn-large {
+    padding: 14px 28px;
+    font-size: 16px;
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn:disabled:hover {
+    transform: none;
+}
+
+/* ===== INPUTS STEAM ===== */
+.input-field {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--input-bg);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: var(--radius-sm);
+    color: var(--text-bright);
+    font-family: var(--font-body);
+    font-size: 14px;
+    transition: all var(--transition-fast);
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--steam-blue);
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 8px rgba(102, 192, 244, 0.3);
+}
+
+.input-field::placeholder {
+    color: var(--text-muted);
+}
+
+/* Remover flechas de inputs numéricos */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+/* ===== SELECT ===== */
+.select-field {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--input-bg);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: var(--radius-sm);
+    color: var(--text-bright);
+    font-family: var(--font-body);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.select-field:focus {
+    outline: none;
+    border-color: var(--steam-blue);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* ===== BADGES ===== */
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-success {
+    background: var(--steam-green);
+    color: white;
+}
+
+.badge-warning {
+    background: var(--steam-orange);
+    color: white;
+}
+
+.badge-danger {
+    background: var(--steam-red);
+    color: white;
+}
+
+.badge-info {
+    background: var(--steam-blue);
+    color: white;
+}
+
+/* ===== ALERTS ===== */
+.alert {
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+    border-left: 3px solid;
+}
+
+.alert-success {
+    background: rgba(91, 163, 43, 0.15);
+    border-color: var(--steam-green);
+    color: var(--steam-green);
+}
+
+.alert-danger {
+    background: rgba(205, 92, 92, 0.15);
+    border-color: var(--steam-red);
+    color: var(--steam-red);
+}
+
+.alert-warning {
+    background: rgba(229, 175, 0, 0.15);
+    border-color: var(--steam-orange);
+    color: var(--steam-orange);
+}
+
+.alert-info {
+    background: rgba(102, 192, 244, 0.15);
+    border-color: var(--steam-blue);
+    color: var(--steam-blue);
+}
+
+/* ===== LOADERS ===== */
+.spinner {
+    border: 3px solid rgba(102, 192, 244, 0.2);
+    border-left-color: var(--steam-blue);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===== TABLAS ===== */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.table thead {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.table th,
+.table td {
+    padding: var(--spacing-sm);
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.table th {
+    color: var(--steam-blue);
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 12px;
+}
+
+.table td {
+    color: var(--text-primary);
+    font-family: var(--font-body);
+}
+
+.table tbody tr {
+    transition: background var(--transition-fast);
+}
+
+.table tbody tr:hover {
+    background: rgba(102, 192, 244, 0.05);
+}
+
+/* ===== TÍTULOS ===== */
+.page-title {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--text-bright);
+    margin-bottom: var(--spacing-lg);
+    letter-spacing: 0.5px;
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text-bright);
+    margin-bottom: var(--spacing-md);
+    letter-spacing: 0.5px;
+}
+
+/* ===== GRIDS ===== */
+.grid {
+    display: grid;
+    gap: var(--spacing-md);
+}
+
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 1200px) {
+    .grid-4 { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .grid-2,
+    .grid-3,
+    .grid-4 { grid-template-columns: 1fr; }
+}
+
+/* ===== FLEX UTILITIES ===== */
+.flex {
+    display: flex;
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.gap-sm { gap: var(--spacing-sm); }
+.gap-md { gap: var(--spacing-md); }
+.gap-lg { gap: var(--spacing-lg); }
+
+/* ===== SPACING UTILITIES ===== */
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+
+/* ===== TEXT UTILITIES ===== */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-muted { color: var(--text-muted); }
+.text-secondary { color: var(--text-secondary); }
+
+/* ===== STEAM DISCOUNT TAG ===== */
+.discount-tag {
+    display: inline-flex;
+    align-items: center;
+    background: var(--steam-green);
+    color: white;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* ===== STEAM PRICE ===== */
+.price-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.price-original {
+    color: var(--text-muted);
+    text-decoration: line-through;
+    font-size: 13px;
+}
+
+.price-final {
+    color: var(--steam-green);
+    font-size: 18px;
+    font-weight: bold;
+}

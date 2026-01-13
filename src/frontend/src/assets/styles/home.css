@@ -1,84 +1,70 @@
 .home-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-    background-size: 400% 400%;
-    animation: gradient 15s ease infinite;
+    background: var(--gradient-bg);
     padding: var(--spacing-md);
 }
 
 .navbar {
     background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-md);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
     margin-bottom: var(--spacing-lg);
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: var(--shadow-md);
-}
-
-.navbar-brand {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
 }
 
 .navbar-brand h1 {
     font-family: var(--font-display);
-    font-size: 32px;
-    color: var(--neon-blue);
-    text-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+    font-size: 24px;
+    color: var(--text-bright);
     margin: 0;
+    font-weight: 400;
 }
 
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-}
-
-.user-badge {
-    background: rgba(0, 243, 255, 0.1);
-    border: 1px solid var(--neon-blue);
-    padding: 8px 16px;
-    border-radius: var(--radius-md);
+.navbar-links {
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
+    flex: 1;
+    margin-left: var(--spacing-lg);
 }
 
-.user-badge .username {
-    color: var(--text-primary);
-    font-weight: 600;
+.navbar-links .btn {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.user-badge .role {
-    color: var(--neon-blue);
-    font-size: 12px;
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-left: auto;
+}
+
+.user-info {
+    text-align: right;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-sm);
+}
+
+.user-info .username {
+    color: var(--text-bright);
+    font-weight: 400;
+    font-size: 14px;
+}
+
+.user-info .role {
+    color: var(--steam-blue);
+    font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.btn-logout {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid #ef4444;
-    color: #fca5a5;
-    padding: 10px 20px;
-    border-radius: var(--radius-md);
-    font-family: var(--font-display);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-logout:hover {
-    background: rgba(239, 68, 68, 0.2);
-    transform: translateY(-2px);
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+    letter-spacing: 0.5px;
 }
 
 .home-content {

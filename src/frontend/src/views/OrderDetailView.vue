@@ -92,14 +92,16 @@ const printOrder = () => {
       </div>
 
       <!-- Error -->
-      <div v-else-if="ordersStore.error" class="error-message">
+      <div v-else-if="ordersStore.error" class="alert alert-danger">
         <p>❌ {{ ordersStore.error }}</p>
-        <button @click="ordersStore.fetchOrderDetail(orderId)" class="btn-retry">
-          🔄 Reintentar
-        </button>
-        <button @click="goBack" class="btn-back">
-          ← Volver a Mis Pedidos
-        </button>
+        <div class="flex gap-sm mt-sm">
+          <button @click="ordersStore.fetchOrderDetail(orderId)" class="btn btn-primary btn-small">
+            🔄 Reintentar
+          </button>
+          <button @click="goBack" class="btn btn-secondary btn-small">
+            ← Volver
+          </button>
+        </div>
       </div>
 
       <!-- Detalle de Orden -->
@@ -107,60 +109,72 @@ const printOrder = () => {
         
         <!-- Header con botón volver -->
         <div class="detail-header">
-          <button @click="goBack" class="btn-back">
+          <button @click="goBack" class="btn btn-secondary">
             ← Volver
-          </button>
-          <button @click="printOrder" class="btn-print">
-            🖨️ Imprimir
           </button>
         </div>
 
         <!-- Información Principal -->
         <div class="order-info-card">
-          <div class="order-title">
-            <h1>Pedido #{{ ordersStore.currentOrder.orderNumber }}</h1>
-            <span 
-              class="status-badge-large" 
-              :style="{ backgroundColor: getStatusInfo(ordersStore.currentOrder.status).color }"
-            >
-              {{ getStatusInfo(ordersStore.currentOrder.status).icon }} 
-              {{ getStatusInfo(ordersStore.currentOrder.status).text }}
-            </span>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">ID de Pedido</span>
+              <span class="info-value order-id">{{ ordersStore.currentOrder.orderNumber }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Fecha de Pedido</span>
+              <span class="info-value">{{ formatDate(ordersStore.currentOrder.createdAt) }}</span>
+            </div>
+            <div class="info-item" v-if="ordersStore.currentOrder.user">
+              <span class="info-label">Cliente</span>
+              <span class="info-value">{{ ordersStore.currentOrder.user.username }}</span>
+            </div>
+            <div class="info-item" v-if="ordersStore.currentOrder.user">
+              <span class="info-label">Email</span>
+              <span class="info-value">{{ ordersStore.currentOrder.user.email }}</span>
+            </div>
           </div>
-          
-          <p class="status-description">
-            {{ getStatusInfo(ordersStore.currentOrder.status).description }}
-          </p>
+        </div>
 
-          <div class="order-meta">
-            <div class="meta-item">
-              <span class="meta-label">📅 Fecha de pedido:</span>
-              <span class="meta-value">{{ formatDate(ordersStore.currentOrder.createdAt) }}</span>
-            </div>
-            <div class="meta-item" v-if="ordersStore.currentOrder.user">
-              <span class="meta-label">👤 Cliente:</span>
-              <span class="meta-value">{{ ordersStore.currentOrder.user.username }}</span>
-            </div>
-            <div class="meta-item" v-if="ordersStore.currentOrder.user">
-              <span class="meta-label">📧 Email:</span>
-              <span class="meta-value">{{ ordersStore.currentOrder.user.email }}</span>
+        <!-- Estado -->
+        <div class="status-section">
+          <h2>📊 Estado del Pedido</h2>
+          <div class="status-timeline">
+            <div 
+              v-for="status in ['pending', 'processing', 'shipped', 'delivered']" 
+              :key="status"
+              class="timeline-item"
+            >
+              <div 
+                :class="['timeline-dot', { 
+                  active: ordersStore.currentOrder.status === status 
+                }]"
+              ></div>
+              <div class="timeline-content">
+                <div class="timeline-status">
+                  {{ getStatusInfo(status).icon }} {{ getStatusInfo(status).text }}
+                </div>
+                <div class="timeline-date" v-if="ordersStore.currentOrder.status === status">
+                  {{ getStatusInfo(status).description }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Dirección de Envío -->
-        <div class="shipping-card" v-if="ordersStore.currentOrder.shippingAddress">
-          <h2>📍 Dirección de Envío</h2>
-          <div class="address-content">
-            <p><strong>{{ ordersStore.currentOrder.shippingAddress.street }}</strong></p>
-            <p>{{ ordersStore.currentOrder.shippingAddress.city }}, {{ ordersStore.currentOrder.shippingAddress.state }}</p>
-            <p>CP: {{ ordersStore.currentOrder.shippingAddress.zipCode }}</p>
-            <p>{{ ordersStore.currentOrder.shippingAddress.country }}</p>
+        <div class="order-info-card" v-if="ordersStore.currentOrder.shippingAddress">
+          <h2 style="margin: 0 0 var(--spacing-md) 0; font-family: var(--font-display); color: var(--text-bright);">📍 Dirección de Envío</h2>
+          <div style="display: flex; flex-direction: column; gap: 4px; color: var(--text-primary);">
+            <p style="margin: 0;"><strong>{{ ordersStore.currentOrder.shippingAddress.street }}</strong></p>
+            <p style="margin: 0;">{{ ordersStore.currentOrder.shippingAddress.city }}, {{ ordersStore.currentOrder.shippingAddress.state }}</p>
+            <p style="margin: 0;">CP: {{ ordersStore.currentOrder.shippingAddress.zipCode }}</p>
+            <p style="margin: 0;">{{ ordersStore.currentOrder.shippingAddress.country }}</p>
           </div>
         </div>
 
         <!-- Productos -->
-        <div class="products-card">
+        <div class="products-section">
           <h2>📦 Productos ({{ ordersStore.currentOrder.items.length }})</h2>
           
           <div class="products-list">
@@ -169,91 +183,44 @@ const printOrder = () => {
               :key="index"
               class="product-item"
             >
-              <div class="product-image">
-                <img :src="getProductImage(item.product)" :alt="item.title">
-              </div>
+              <img 
+                :src="getProductImage(item.product)" 
+                :alt="item.title"
+                class="product-image"
+              >
               
               <div class="product-info">
-                <h3>{{ item.title }}</h3>
-                <p class="product-price">{{ formatPrice(item.price) }} c/u</p>
-                <p class="product-quantity">Cantidad: {{ item.quantity }}</p>
+                <div class="product-name">{{ item.title }}</div>
+                <div class="product-description">{{ item.product?.description || 'Producto' }}</div>
               </div>
 
-              <div class="product-total">
-                <p class="total-label">Subtotal</p>
-                <p class="total-amount">{{ formatPrice(item.price * item.quantity) }}</p>
+              <div class="product-quantity">
+                × {{ item.quantity }}
+              </div>
+
+              <div class="product-price">
+                {{ formatPrice(item.price * item.quantity) }}
               </div>
             </div>
           </div>
         </div>
 
         <!-- Resumen de Pago -->
-        <div class="payment-summary">
+        <div class="summary-section">
           <h2>💰 Resumen de Pago</h2>
           
-          <div class="summary-rows">
+          <div>
             <div class="summary-row">
-              <span>Subtotal ({{ ordersStore.currentOrder.items.length }} items)</span>
-              <span>{{ formatPrice(ordersStore.currentOrder.totalAmount) }}</span>
+              <span class="summary-label">Subtotal ({{ ordersStore.currentOrder.items.length }} items)</span>
+              <span class="summary-value">{{ formatPrice(ordersStore.currentOrder.totalAmount) }}</span>
             </div>
             <div class="summary-row">
-              <span>Envío</span>
-              <span class="free">GRATIS 🎉</span>
+              <span class="summary-label">Envío</span>
+              <span class="summary-value" style="color: var(--steam-green);">GRATIS 🎉</span>
             </div>
-            <div class="summary-divider"></div>
-            <div class="summary-row summary-total">
-              <span>Total</span>
-              <span>{{ formatPrice(ordersStore.currentOrder.totalAmount) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Timeline de Estado -->
-        <div class="status-timeline">
-          <h2>📊 Estado del Pedido</h2>
-          <div class="timeline">
-            <div 
-              class="timeline-item"
-              :class="{ active: ['pending', 'processing', 'shipped', 'delivered'].includes(ordersStore.currentOrder.status) }"
-            >
-              <div class="timeline-icon">⏳</div>
-              <div class="timeline-content">
-                <h4>Pendiente</h4>
-                <p>Pedido recibido</p>
-              </div>
-            </div>
-
-            <div 
-              class="timeline-item"
-              :class="{ active: ['processing', 'shipped', 'delivered'].includes(ordersStore.currentOrder.status) }"
-            >
-              <div class="timeline-icon">⚙️</div>
-              <div class="timeline-content">
-                <h4>Procesando</h4>
-                <p>Preparando tu pedido</p>
-              </div>
-            </div>
-
-            <div 
-              class="timeline-item"
-              :class="{ active: ['shipped', 'delivered'].includes(ordersStore.currentOrder.status) }"
-            >
-              <div class="timeline-icon">🚚</div>
-              <div class="timeline-content">
-                <h4>Enviado</h4>
-                <p>En camino</p>
-              </div>
-            </div>
-
-            <div 
-              class="timeline-item"
-              :class="{ active: ordersStore.currentOrder.status === 'delivered' }"
-            >
-              <div class="timeline-icon">✅</div>
-              <div class="timeline-content">
-                <h4>Entregado</h4>
-                <p>Pedido completado</p>
-              </div>
+            <div class="summary-row">
+              <span class="summary-label">Total</span>
+              <span class="summary-value">{{ formatPrice(ordersStore.currentOrder.totalAmount) }}</span>
             </div>
           </div>
         </div>

@@ -51,31 +51,33 @@ const viewOrderDetail = (orderId) => {
   <div class="my-orders-view">
     <div class="orders-container">
       <div class="orders-header">
-        <button @click="goBack" class="btn-back-orders">← Volver</button>
-        <h1>📦 Mis Pedidos</h1>
-        <p class="subtitle">Historial de todas tus compras</p>
+        <div>
+          <h1 class="page-title">📦 Mis Pedidos</h1>
+          <p class="subtitle text-secondary">Historial de todas tus compras</p>
+        </div>
+        <button @click="goBack" class="btn btn-secondary">← Volver</button>
       </div>
 
       <!-- Loading -->
-      <div v-if="ordersStore.loading" class="loading">
+      <div v-if="ordersStore.loading" class="flex-center flex-col gap-md" style="min-height: 400px;">
         <div class="spinner"></div>
-        <p>Cargando pedidos...</p>
+        <p class="text-secondary">Cargando pedidos...</p>
       </div>
 
       <!-- Error -->
-      <div v-else-if="ordersStore.error" class="error-message">
+      <div v-else-if="ordersStore.error" class="alert alert-danger">
         <p>❌ {{ ordersStore.error }}</p>
-        <button @click="ordersStore.fetchMyOrders()" class="btn-retry">
+        <button @click="ordersStore.fetchMyOrders()" class="btn btn-primary btn-small mt-sm">
           🔄 Reintentar
         </button>
       </div>
 
       <!-- Sin órdenes -->
-      <div v-else-if="!ordersStore.hasOrders" class="empty-orders">
-        <div class="empty-icon">📦</div>
-        <h2>No tienes pedidos aún</h2>
-        <p>Explora nuestros productos y haz tu primera compra</p>
-        <router-link to="/products" class="btn-shop">
+      <div v-else-if="!ordersStore.hasOrders" class="card text-center p-lg">
+        <div style="font-size: 80px; margin-bottom: var(--spacing-md);">📦</div>
+        <h2 class="section-title mb-sm">No tienes pedidos aún</h2>
+        <p class="text-secondary mb-md">Explora nuestros productos y haz tu primera compra</p>
+        <router-link to="/products" class="btn btn-primary">
           🛍️ Ir a Productos
         </router-link>
       </div>

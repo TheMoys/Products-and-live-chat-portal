@@ -170,17 +170,17 @@ async function handleDelete(id) {
         <header class="products-header">
             <h1>🎮 PRODUCTOS</h1>
             <div class="header-actions">
-                <button @click="goBack" class="btn-back">← Volver</button>
+                <button @click="goBack" class="btn btn-secondary">← Volver</button>
                 
-                <!-- ✅ NUEVO: Botón ir al carrito -->
-                <button @click="goToCart" class="btn-cart">
+                <!-- ✅ NUEVO: Botón ir al carrito (solo usuarios normales) -->
+                <button v-if="!authStore.isAdmin" @click="goToCart" class="btn btn-primary">
                     🛒 Carrito
                     <span v-if="cartStore.itemCount > 0" class="cart-badge">
                         {{ cartStore.itemCount }}
                     </span>
                 </button>
 
-                <button v-if="authStore.isAdmin" @click="openModal()" class="btn-add">
+                <button v-if="authStore.isAdmin" @click="openModal()" class="btn btn-success">
                     + Agregar Producto
                 </button>
             </div>
@@ -188,149 +188,234 @@ async function handleDelete(id) {
 
         <div class="products-content">
             <div v-if="productStore.loading" class="loading-container">
-                <div class="loading-spinner"></div>
-                <p>Cargando productos...</p>
+                <div class="spinner"></div>
+                <p class="text-secondary">Cargando productos...</p>
             </div>
 
-            <div v-else-if="productStore.error" class="error-message">
+            <div v-else-if="productStore.error" class="alert alert-danger">
                 {{ productStore.error }}
             </div>
 
             <div v-else-if="productStore.products.length === 0" class="empty-state">
                 <div class="empty-state-icon">📦</div>
-                <h3>No hay productos</h3>
-                <p v-if="authStore.isAdmin">Agrega tu primer producto para comenzar</p>
+                <h3 class="empty-state-text">No hay productos</h3>
+                <p v-if="authStore.isAdmin" class="text-secondary">Agrega tu primer producto para comenzar</p>
             </div>
 
             <div v-else class="products-grid">
                 <div v-for="product in productStore.products" :key="product._id" class="product-card">
                     <!-- Imagen del producto -->
-                    <div class="product-image">
-                        <img v-if="product.imageData || product.imageUrl" :src="product.imageData || product.imageUrl"
-                            :alt="product.title" @error="handleImageError" />
-                        <span v-else class="product-icon">🎮</span>
-                        
-                        <!-- ✅ NUEVO: Badge si está en carrito -->
-                        <div v-if="isInCart(product._id)" class="in-cart-badge">
-                            ✓ En carrito
+                    <div class="product-image-container">
+                        <!-- Badge de stock -->
+                        <span 
+                          v-if="product.stock === 0" 
+                          class="stock-badge out-of-stock"
+                        >
+                          SIN STOCK
+                        </span>
+                        <span 
+                          v-else-if="product.stock <= 5" 
+                          class="stock-badge low-stock"
+                        >
+                          POCO STOCK
+                        </span>
+                        <span 
+                          v-else 
+                          class="stock-badge in-stock"
+                        >
+                          DISPONIBLE
+                        </span>
+
+                        <!-- Badge si está en carrito (solo usuarios normales) -->
+                        <div v-if="!authStore.isAdmin && isInCart(product._id)" class="in-cart-badge">
+                            🛒 En carrito
+                        </div>
+
+                        <img 
+                          v-if="product.imageData || product.imageUrl" 
+                          :src="product.imageData || product.imageUrl"
+                          :alt="product.title" 
+                          class="product-image"
+                          @error="handleImageError" 
+                        />
+                        <div v-else class="product-image" style="display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                          🎮
                         </div>
                     </div>
 
-                    <div class="product-info">
-                        <h3>{{ product.title }}</h3>
-                        <p>{{ product.description || 'Sin descripción' }}</p>
+                    <div class="product-content">
+                        <h3 class="product-name">{{ product.title }}</h3>
+                        <p class="product-description">{{ product.description || 'Sin descripción' }}</p>
                         <div class="product-meta">
                             <span class="product-price">${{ product.price.toFixed(2) }}</span>
-                            <span class="product-stock" :class="{
-                                low: product.stock > 0 && product.stock <= 5,
-                                out: product.stock === 0
-                            }">
-                                {{ product.stock > 0 ? `Stock: ${product.stock}` : 'Agotado' }}
+                            <span class="product-stock">
+                                Stock: {{ product.stock }}
                             </span>
                         </div>
-                    </div>
 
-                    <!-- ✅ NUEVO: Botón añadir al carrito -->
-                    <button 
-                        v-if="product.stock > 0"
-                        @click="addToCart(product)"
-                        class="btn-add-to-cart"
-                        :disabled="cartStore.loading"
-                    >
-                        <span v-if="isInCart(product._id)">➕ Agregar más</span>
-                        <span v-else>🛒 Añadir al carrito</span>
-                    </button>
-                    
-                    <button v-else class="btn-out-of-stock" disabled>
-                        ❌ Sin stock
-                    </button>
+                        <!-- Botones de usuario -->
+                        <div v-if="!authStore.isAdmin" class="product-actions">
+                          <button 
+                            v-if="product.stock > 0"
+                            @click="addToCart(product)"
+                            class="btn btn-primary"
+                            :disabled="cartStore.loading"
+                          >
+                            <span v-if="isInCart(product._id)">➕ Agregar más</span>
+                            <span v-else>🛒 Añadir al carrito</span>
+                          </button>
+                          
+                          <button v-else class="btn btn-danger" disabled>
+                            ❌ Sin stock
+                          </button>
+                        </div>
 
-                    <!-- Botones admin (se mantienen igual) -->
-                    <div v-if="authStore.isAdmin" class="product-actions">
-                        <button @click="openModal(product)" class="btn-edit">Editar</button>
-                        <button @click="handleDelete(product._id)" class="btn-delete">Eliminar</button>
+                        <!-- Botones admin -->
+                        <div v-if="authStore.isAdmin" class="admin-actions">
+                            <button @click="openModal(product)" class="btn btn-warning btn-small">✏️ Editar</button>
+                            <button @click="handleDelete(product._id)" class="btn btn-danger btn-small">🗑️ Eliminar</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Modal (sin cambios) -->
+        <!-- Modal -->
         <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2>{{ editingProduct ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
-                    <button @click="closeModal" class="btn-close">×</button>
+                    <button @click="closeModal" class="modal-close">×</button>
                 </div>
 
                 <form @submit.prevent="handleSubmit" class="product-form">
-                    <!-- TABS: Subir archivo O URL -->
-                    <div class="input-group">
+                    <!-- Imagen del Producto -->
+                    <div class="form-group">
                         <label>Imagen del Producto</label>
-                        <div class="image-tabs">
-                            <button type="button" :class="['tab-btn', { active: imageMode === 'upload' }]"
-                                @click="imageMode = 'upload'">
+                        <div style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm);">
+                            <button 
+                              type="button" 
+                              :class="['btn', 'btn-small', imageMode === 'upload' ? 'btn-primary' : 'btn-outline']"
+                              @click="imageMode = 'upload'"
+                            >
                                 📁 Subir Archivo
                             </button>
-                            <button type="button" :class="['tab-btn', { active: imageMode === 'url' }]"
-                                @click="imageMode = 'url'">
+                            <button 
+                              type="button" 
+                              :class="['btn', 'btn-small', imageMode === 'url' ? 'btn-primary' : 'btn-outline']"
+                              @click="imageMode = 'url'"
+                            >
                                 🔗 URL Externa
                             </button>
                         </div>
 
                         <!-- Upload de archivo -->
-                        <div v-if="imageMode === 'upload'" class="upload-section">
-                            <input type="file" @change="handleFileChange" accept="image/*" ref="fileInput"
-                                style="display: none" />
-                            <button type="button" @click="$refs.fileInput.click()" class="btn-upload">
+                        <div v-if="imageMode === 'upload'">
+                            <input 
+                              type="file" 
+                              @change="handleFileChange" 
+                              accept="image/*" 
+                              ref="fileInput"
+                              style="display: none" 
+                            />
+                            <button 
+                              type="button" 
+                              @click="$refs.fileInput.click()" 
+                              class="btn btn-outline"
+                              style="width: 100%;"
+                            >
                                 {{ imagePreview ? '✏️ Cambiar Imagen' : '📷 Seleccionar Imagen' }}
                             </button>
-                            <div v-if="imagePreview" class="image-preview">
-                                <img :src="imagePreview" alt="Preview" />
-                            </div>
+                            <img 
+                              v-if="imagePreview" 
+                              :src="imagePreview" 
+                              alt="Preview" 
+                              class="image-preview"
+                              style="margin-top: var(--spacing-sm);"
+                            />
                         </div>
 
                         <!-- URL externa -->
-                        <div v-else class="url-section">
-                            <input type="url" v-model="form.imageUrl" placeholder="https://ejemplo.com/imagen.jpg"
-                                @input="updateUrlPreview" />
-                            <div v-if="form.imageUrl" class="image-preview">
-                                <img :src="form.imageUrl" alt="Preview" @error="imageError = true" />
-                                <p v-if="imageError" class="error-text">⚠️ URL inválida</p>
-                            </div>
+                        <div v-else>
+                            <input 
+                              type="url" 
+                              v-model="form.imageUrl" 
+                              placeholder="https://ejemplo.com/imagen.jpg"
+                              class="input-field"
+                            />
+                            <img 
+                              v-if="form.imageUrl && !imageError" 
+                              :src="form.imageUrl" 
+                              alt="Preview" 
+                              @error="imageError = true"
+                              class="image-preview"
+                              style="margin-top: var(--spacing-sm);"
+                            />
+                            <p v-if="imageError" class="alert alert-warning" style="margin-top: var(--spacing-sm);">
+                              ⚠️ URL inválida o imagen no disponible
+                            </p>
                         </div>
                     </div>
 
-                    <div class="input-group">
+                    <div class="form-group">
                         <label for="title">Título del Producto</label>
-                        <input type="text" id="title" v-model="form.title" placeholder="Ej: Cyberpunk 2077" required />
+                        <input 
+                          type="text" 
+                          id="title" 
+                          v-model="form.title" 
+                          placeholder="Ej: Cyberpunk 2077" 
+                          class="input-field"
+                          required 
+                        />
                     </div>
 
-                    <div class="input-group">
+                    <div class="form-group">
                         <label for="description">Descripción</label>
-                        <textarea id="description" v-model="form.description" placeholder="Descripción del producto..."
-                            rows="4"></textarea>
+                        <textarea 
+                          id="description" 
+                          v-model="form.description" 
+                          placeholder="Descripción del producto..."
+                          class="input-field"
+                          rows="4"
+                        ></textarea>
                     </div>
 
-                    <div class="input-group">
+                    <div class="form-group">
                         <label for="price">Precio ($)</label>
-                        <input type="number" id="price" v-model.number="form.price" placeholder="0.00" step="0.01"
-                            min="0" required />
+                        <input 
+                          type="number" 
+                          id="price" 
+                          v-model.number="form.price" 
+                          placeholder="0.00" 
+                          step="0.01"
+                          min="0" 
+                          class="input-field"
+                          required 
+                        />
                     </div>
 
-                    <div class="input-group">
+                    <div class="form-group">
                         <label for="stock">Stock</label>
-                        <input type="number" id="stock" v-model.number="form.stock" placeholder="0" min="0" required />
+                        <input 
+                          type="number" 
+                          id="stock" 
+                          v-model.number="form.stock" 
+                          placeholder="0" 
+                          min="0"
+                          class="input-field"
+                          required 
+                        />
                     </div>
 
-                    <div v-if="error" class="error-message">
+                    <div v-if="error" class="alert alert-danger">
                         {{ error }}
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" @click="closeModal" class="btn-cancel">Cancelar</button>
-                        <button type="submit" class="btn-submit" :disabled="loading">
-                            <span v-if="!loading">{{ editingProduct ? 'Actualizar' : 'Crear' }}</span>
-                            <span v-else class="loader"></span>
+                        <button type="button" @click="closeModal" class="btn btn-secondary">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" :disabled="loading">
+                            <span v-if="!loading">{{ editingProduct ? '💾 Actualizar' : '➕ Crear' }}</span>
+                            <span v-else class="spinner"></span>
                         </button>
                     </div>
                 </form>
@@ -338,3 +423,5 @@ async function handleDelete(id) {
         </div>
     </div>
 </template>
+
+<style src="@/assets/styles/products.css"></style>

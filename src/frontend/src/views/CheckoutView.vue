@@ -105,36 +105,36 @@ const getProductImage = (product) => {
     <div class="checkout-view">
         <div class="checkout-container">
             <div class="checkout-header">
-                <h1>💳 Finalizar Compra</h1>
-                <button @click="handleCancel" class="btn-back">← Volver al Carrito</button>
+                <h1 class="page-title">💳 Finalizar Compra</h1>
+                <button @click="handleCancel" class="btn btn-secondary">← Volver</button>
             </div>
 
             <!-- Loading -->
-            <div v-if="cartStore.loading" class="loading">
+            <div v-if="cartStore.loading" class="flex-center flex-col gap-md" style="min-height: 400px;">
                 <div class="spinner"></div>
-                <p>Cargando información...</p>
+                <p class="text-secondary">Cargando información...</p>
             </div>
 
             <!-- Error de carrito vacío -->
-            <div v-else-if="cartStore.isEmpty" class="empty-state">
-                <div class="empty-icon">🛒</div>
-                <h2>Tu carrito está vacío</h2>
-                <p>Agrega productos antes de hacer checkout</p>
-                <router-link to="/products" class="btn-shop">
+            <div v-else-if="cartStore.isEmpty" class="card text-center p-lg">
+                <div style="font-size: 80px; margin-bottom: var(--spacing-md);">🛒</div>
+                <h2 class="section-title mb-sm">Tu carrito está vacío</h2>
+                <p class="text-secondary mb-md">Agrega productos antes de hacer checkout</p>
+                <router-link to="/products" class="btn btn-primary">
                     🛍️ Ir a Productos
                 </router-link>
             </div>
 
             <!-- Formulario y resumen -->
             <div v-else class="checkout-content">
-                <div class="checkout-form">
-                    <h2>📍 Dirección de Envío</h2>
+                <div class="checkout-form card">
+                    <h2 class="section-title">📍 Dirección de Envío</h2>
 
                     <form @submit.prevent="handleSubmit">
                         <div class="form-row">
                             <div class="input-group" :class="{ error: formErrors.street }">
                                 <label for="street">Dirección *</label>
-                                <input id="street" v-model="form.street" type="text"
+                                <input id="street" v-model="form.street" type="text" class="input-field"
                                     placeholder="Calle, número, colonia" :disabled="loading" />
                                 <span v-if="formErrors.street" class="error-message">
                                     {{ formErrors.street }}
@@ -145,7 +145,7 @@ const getProductImage = (product) => {
                         <div class="form-row">
                             <div class="input-group" :class="{ error: formErrors.city }">
                                 <label for="city">Ciudad *</label>
-                                <input id="city" v-model="form.city" type="text" placeholder="Ciudad"
+                                <input id="city" v-model="form.city" type="text" class="input-field" placeholder="Ciudad"
                                     :disabled="loading" />
                                 <span v-if="formErrors.city" class="error-message">
                                     {{ formErrors.city }}
@@ -154,7 +154,7 @@ const getProductImage = (product) => {
 
                             <div class="input-group" :class="{ error: formErrors.state }">
                                 <label for="state">Estado *</label>
-                                <input id="state" v-model="form.state" type="text" placeholder="Estado"
+                                <input id="state" v-model="form.state" type="text" class="input-field" placeholder="Estado"
                                     :disabled="loading" />
                                 <span v-if="formErrors.state" class="error-message">
                                     {{ formErrors.state }}
@@ -165,7 +165,7 @@ const getProductImage = (product) => {
                         <div class="form-row">
                             <div class="input-group" :class="{ error: formErrors.zipCode }">
                                 <label for="zipCode">Código Postal *</label>
-                                <input id="zipCode" v-model="form.zipCode" type="text" placeholder="12345" maxlength="5"
+                                <input id="zipCode" v-model="form.zipCode" type="text" class="input-field" placeholder="12345" maxlength="5"
                                     :disabled="loading" />
                                 <span v-if="formErrors.zipCode" class="error-message">
                                     {{ formErrors.zipCode }}
@@ -174,7 +174,7 @@ const getProductImage = (product) => {
 
                             <div class="input-group" :class="{ error: formErrors.country }">
                                 <label for="country">País *</label>
-                                <input id="country" v-model="form.country" type="text" placeholder="México"
+                                <input id="country" v-model="form.country" type="text" class="input-field" placeholder="México"
                                     :disabled="loading" />
                                 <span v-if="formErrors.country" class="error-message">
                                     {{ formErrors.country }}
@@ -183,22 +183,22 @@ const getProductImage = (product) => {
                         </div>
 
                         <!-- Error general -->
-                        <div v-if="error" class="error-alert">
+                        <div v-if="error" class="alert alert-danger">
                             ❌ {{ error }}
                         </div>
 
                         <!-- Botones -->
                         <div class="form-actions">
-                            <button type="button" @click="handleCancel" class="btn-cancel" :disabled="loading">
+                            <button type="button" @click="handleCancel" class="btn btn-secondary" :disabled="loading">
                                 Cancelar
                             </button>
-                            <button type="submit" class="btn-submit" :disabled="loading">
+                            <button type="submit" class="btn btn-success btn-large" :disabled="loading">
                                 <span v-if="loading">
                                     <div class="btn-spinner"></div>
                                     Procesando...
                                 </span>
-                                <span v-else>
-                                    ✅ Confirmar Pedido
+                                <span v-else">
+                                    Confirmar Pedido
                                 </span>
                             </button>
                         </div>
@@ -206,8 +206,8 @@ const getProductImage = (product) => {
                 </div>
 
                 <!-- Resumen del pedido (sidebar) -->
-                <div class="order-summary">
-                    <h2>📦 Resumen del Pedido</h2>
+                <div class="order-summary card">
+                    <h2 class="section-title">📦 Resumen del Pedido</h2>
 
                     <div class="summary-items">
                         <div v-for="item in cartStore.cart.items" :key="item.product._id" class="summary-item">

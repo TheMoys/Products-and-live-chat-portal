@@ -134,8 +134,8 @@ const formatDate = (date) => {
       
       <!-- Header -->
       <div class="admin-header">
-        <button @click="goBack" class="btn-back">← Volver</button>
         <h1>👥 Gestión de Usuarios</h1>
+        <button @click="goBack" class="btn btn-secondary">← Volver</button>
       </div>
 
       <!-- Loading -->
@@ -163,7 +163,7 @@ const formatDate = (date) => {
             </div>
           </div>
 
-          <div class="stat-card regular">
+          <div class="stat-card users">
             <div class="stat-icon">👤</div>
             <div class="stat-content">
               <h3>{{ stats.regularUsers }}</h3>
@@ -181,26 +181,36 @@ const formatDate = (date) => {
         </div>
 
         <!-- Filtros y Búsqueda -->
-        <div class="filters">
-          <div class="search-box">
-            <input 
-              v-model="searchQuery"
-              @keyup.enter="handleSearch"
-              type="text" 
-              placeholder="🔍 Buscar por username o email..."
-            >
-            <button @click="handleSearch" class="btn-search">Buscar</button>
-          </div>
+        <div class="filters-section">
+          <div class="filters-row">
+            <div class="filter-group">
+              <label>Búsqueda</label>
+              <input 
+                v-model="searchQuery"
+                @keyup.enter="handleSearch"
+                type="text" 
+                placeholder="🔍 Buscar por username o email..."
+                class="input-field"
+              >
+            </div>
 
-          <select v-model="roleFilter" @change="handleFilterChange" class="role-filter">
-            <option value="">Todos los roles</option>
-            <option value="user">👤 Usuarios</option>
-            <option value="admin">🛡️ Administradores</option>
-          </select>
+            <div class="filter-group">
+              <label>Rol</label>
+              <select v-model="roleFilter" @change="handleFilterChange" class="input-field">
+                <option value="">Todos los roles</option>
+                <option value="user">👤 Usuarios</option>
+                <option value="admin">🛡️ Administradores</option>
+              </select>
+            </div>
+
+            <button @click="handleSearch" class="btn btn-primary">
+              🔍 Buscar
+            </button>
+          </div>
         </div>
 
         <!-- Tabla -->
-        <div class="table-container">
+        <div class="users-table-container">
           <table class="users-table">
             <thead>
               <tr>
@@ -215,40 +225,42 @@ const formatDate = (date) => {
             <tbody>
               <tr v-for="user in users" :key="user._id">
                 <td>
-                  <div class="user-cell">
+                  <div class="user-info-cell">
                     <div class="user-avatar">
                       {{ user.username.charAt(0).toUpperCase() }}
                     </div>
-                    <strong>{{ user.username }}</strong>
+                    <div class="user-details">
+                      <div class="user-name">{{ user.username }}</div>
+                    </div>
                   </div>
                 </td>
                 <td>{{ user.email }}</td>
                 <td>
                   <span :class="['role-badge', user.role]">
-                    {{ user.role === 'admin' ? '🛡️ Admin' : '👤 Usuario' }}
+                    {{ user.role === 'admin' ? 'ADMIN' : 'USER' }}
                   </span>
                 </td>
                 <td>
                   <span :class="['status-badge', user.isActive ? 'active' : 'inactive']">
-                    {{ user.isActive ? '✅ Activo' : '❌ Inactivo' }}
+                    {{ user.isActive ? 'ACTIVO' : 'INACTIVO' }}
                   </span>
                 </td>
                 <td>{{ formatDate(user.createdAt) }}</td>
                 <td>
                   <div class="action-buttons">
-                    <button @click="openEditModal(user)" class="btn-edit" title="Editar">
-                      ✏️
+                    <button @click="openEditModal(user)" class="action-btn edit" title="Editar">
+                      ✏️ Editar
                     </button>
                     <button 
                       @click="handleToggleStatus(user._id)" 
-                      class="btn-toggle"
+                      class="action-btn toggle"
                       :title="user.isActive ? 'Desactivar' : 'Activar'"
                     >
                       {{ user.isActive ? '🔒' : '🔓' }}
                     </button>
                     <button 
                       @click="handleDeleteUser(user._id, user.username)" 
-                      class="btn-delete"
+                      class="action-btn delete"
                       title="Eliminar"
                     >
                       🗑️

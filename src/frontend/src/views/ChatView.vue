@@ -1,12 +1,12 @@
 <template>
     <div class="chat-container">
         <header class="chat-header">
-            <button @click="goBack" class="btn-back">← Volver</button>
             <h1>💬 CHAT EN VIVO</h1>
             <div class="connection-status" :class="{ connected }">
                 <span class="status-dot"></span>
                 {{ connected ? 'Conectado' : 'Desconectado' }}
             </div>
+            <button @click="goBack" class="btn btn-secondary">← Volver</button>
         </header>
 
         <div class="chat-content">

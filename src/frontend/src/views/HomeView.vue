@@ -4,29 +4,39 @@
             <div class="navbar-brand">
                 <h1>Arcane Archives</h1>
             </div>
-            <div class="user-info">
-                <div class="user-badge">
-                    <div>
-                        <div class="username">{{ authStore.user?.username }}</div>
-                        <div class="role">{{ authStore.user?.role }}</div>
-                    </div>
+            
+            <!-- Navegación principal -->
+            <div class="navbar-links">
+                
+                <router-link v-if="!authStore.isAdmin" to="/cart" class="btn btn-secondary">
+                    🛒 Carrito
+                </router-link>
+                
+                <router-link to="/my-orders" class="btn btn-secondary">
+                    📦 Mis Pedidos
+                </router-link>
+                
+                <template v-if="authStore.isAdmin">
+                    <router-link to="/admin/orders" class="btn btn-secondary">
+                        🛠️ Gestión Pedidos
+                    </router-link>
+
+                    <router-link to="/admin/users" class="btn btn-secondary">
+                        👥 Gestión Usuarios
+                    </router-link>
+                </template>
+            </div>
+            
+            <!-- Usuario y logout a la derecha -->
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="username">{{ authStore.user?.username }}</div>
+                    <div class="role">{{ authStore.user?.role }}</div>
                 </div>
-                <button @click="handleLogout" class="btn-logout">
+                <button @click="handleLogout" class="btn btn-danger btn-small">
                     Cerrar Sesión
                 </button>
             </div>
-            <router-link to="/my-orders" class="nav-link">
-                📦 Mis Pedidos
-            </router-link>
-            <template v-if="authStore.isAdmin">
-                <router-link to="/admin/orders" class="nav-link admin-link">
-                    🛠️ Gestión Pedidos
-                </router-link>
-
-                <router-link to="/admin/users" class="nav-link admin-link">
-                    👥 Gestión Usuarios
-                </router-link>
-            </template>
         </nav>
 
         <div class="home-content">
