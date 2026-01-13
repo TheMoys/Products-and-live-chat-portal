@@ -284,31 +284,45 @@ const formatDate = (date) => {
       <div class="modal-content">
         <div class="modal-header">
           <h2>✏️ Editar Usuario</h2>
-          <button @click="closeModal" class="btn-close">×</button>
+          <button @click="closeModal" class="modal-close">×</button>
         </div>
 
-        <form @submit.prevent="handleUpdateUser" class="user-form">
-          <div class="input-group">
+        <form @submit.prevent="handleUpdateUser" class="modal-form">
+          <div class="form-group">
             <label>Username</label>
-            <input v-model="modalForm.username" type="text" required>
+            <input 
+              v-model="modalForm.username" 
+              type="text" 
+              class="input-field"
+              required
+            >
           </div>
 
-          <div class="input-group">
+          <div class="form-group">
             <label>Email</label>
-            <input v-model="modalForm.email" type="email" required>
+            <input 
+              v-model="modalForm.email" 
+              type="email" 
+              class="input-field"
+              required
+            >
           </div>
 
-          <div class="input-group">
+          <div class="form-group">
             <label>Rol</label>
-            <select v-model="modalForm.role" required>
+            <select 
+              v-model="modalForm.role" 
+              class="input-field"
+              required
+            >
               <option value="user">👤 Usuario</option>
               <option value="admin">🛡️ Administrador</option>
             </select>
           </div>
 
-          <div class="form-actions">
-            <button type="button" @click="closeModal" class="btn-cancel">Cancelar</button>
-            <button type="submit" class="btn-submit">💾 Guardar</button>
+          <div class="modal-actions">
+            <button type="button" @click="closeModal" class="btn btn-secondary">Cancelar</button>
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
           </div>
         </form>
       </div>

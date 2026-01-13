@@ -3,12 +3,12 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useProductStore } from '@/stores/products'
-import { useCartStore } from '@/stores/cart' // ✅ NUEVO
+import { useCartStore } from '@/stores/cart'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const productStore = useProductStore()
-const cartStore = useCartStore() // ✅ NUEVO
+const cartStore = useCartStore()
 
 const showModal = ref(false)
 const editingProduct = ref(null)
@@ -30,7 +30,7 @@ const form = ref({
 
 onMounted(() => {
     productStore.fetchProducts()
-    cartStore.fetchCart() // ✅ NUEVO: Cargar carrito
+    cartStore.fetchCart()
 })
 
 watch(() => form.value.imageUrl, () => {
@@ -41,22 +41,19 @@ function goBack() {
     router.push('/')
 }
 
-// ✅ NUEVO: Función para añadir al carrito
 async function addToCart(product) {
     try {
         await cartStore.addItem(product._id, 1)
-        alert(`✅ "${product.title}" agregado al carrito`)
+        alert(`"${product.title}" agregado al carrito`)
     } catch (err) {
-        alert('❌ Error al agregar al carrito')
+        alert('Error al agregar al carrito')
     }
 }
 
-// ✅ NUEVO: Verificar si está en carrito
 function isInCart(productId) {
     return cartStore.cart?.items?.some(item => item.product.id === productId || item.product._id === productId)
 }
 
-// ✅ NUEVO: Ir al carrito
 function goToCart() {
     router.push('/cart')
 }
@@ -168,13 +165,12 @@ async function handleDelete(id) {
 <template>
     <div class="products-container">
         <header class="products-header">
-            <h1>🎮 PRODUCTOS</h1>
+            <h1>PRODUCTOS</h1>
             <div class="header-actions">
                 <button @click="goBack" class="btn btn-secondary">← Volver</button>
                 
-                <!-- ✅ NUEVO: Botón ir al carrito (solo usuarios normales) -->
                 <button v-if="!authStore.isAdmin" @click="goToCart" class="btn btn-primary">
-                    🛒 Carrito
+                    Carrito
                     <span v-if="cartStore.itemCount > 0" class="cart-badge">
                         {{ cartStore.itemCount }}
                     </span>
@@ -204,9 +200,7 @@ async function handleDelete(id) {
 
             <div v-else class="products-grid">
                 <div v-for="product in productStore.products" :key="product._id" class="product-card">
-                    <!-- Imagen del producto -->
                     <div class="product-image-container">
-                        <!-- Badge de stock -->
                         <span 
                           v-if="product.stock === 0" 
                           class="stock-badge out-of-stock"
@@ -226,9 +220,8 @@ async function handleDelete(id) {
                           DISPONIBLE
                         </span>
 
-                        <!-- Badge si está en carrito (solo usuarios normales) -->
                         <div v-if="!authStore.isAdmin && isInCart(product._id)" class="in-cart-badge">
-                            🛒 En carrito
+                            En carrito
                         </div>
 
                         <img 
@@ -253,7 +246,6 @@ async function handleDelete(id) {
                             </span>
                         </div>
 
-                        <!-- Botones de usuario -->
                         <div v-if="!authStore.isAdmin" class="product-actions">
                           <button 
                             v-if="product.stock > 0"
@@ -261,26 +253,24 @@ async function handleDelete(id) {
                             class="btn btn-primary"
                             :disabled="cartStore.loading"
                           >
-                            <span v-if="isInCart(product._id)">➕ Agregar más</span>
-                            <span v-else>🛒 Añadir al carrito</span>
+                            <span v-if="isInCart(product._id)">Agregar más</span>
+                            <span v-else>Añadir al carrito</span>
                           </button>
                           
                           <button v-else class="btn btn-danger" disabled>
-                            ❌ Sin stock
+                            Sin stock
                           </button>
                         </div>
 
-                        <!-- Botones admin -->
                         <div v-if="authStore.isAdmin" class="admin-actions">
-                            <button @click="openModal(product)" class="btn btn-warning btn-small">✏️ Editar</button>
-                            <button @click="handleDelete(product._id)" class="btn btn-danger btn-small">🗑️ Eliminar</button>
+                            <button @click="openModal(product)" class="btn btn-warning btn-small">Editar</button>
+                            <button @click="handleDelete(product._id)" class="btn btn-danger btn-small">Eliminar</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Modal -->
         <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -289,7 +279,6 @@ async function handleDelete(id) {
                 </div>
 
                 <form @submit.prevent="handleSubmit" class="product-form">
-                    <!-- Imagen del Producto -->
                     <div class="form-group">
                         <label>Imagen del Producto</label>
                         <div style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm);">
@@ -298,18 +287,17 @@ async function handleDelete(id) {
                               :class="['btn', 'btn-small', imageMode === 'upload' ? 'btn-primary' : 'btn-outline']"
                               @click="imageMode = 'upload'"
                             >
-                                📁 Subir Archivo
+                                Subir Archivo
                             </button>
                             <button 
                               type="button" 
                               :class="['btn', 'btn-small', imageMode === 'url' ? 'btn-primary' : 'btn-outline']"
                               @click="imageMode = 'url'"
                             >
-                                🔗 URL Externa
+                                URL Externa
                             </button>
                         </div>
 
-                        <!-- Upload de archivo -->
                         <div v-if="imageMode === 'upload'">
                             <input 
                               type="file" 
@@ -324,7 +312,7 @@ async function handleDelete(id) {
                               class="btn btn-outline"
                               style="width: 100%;"
                             >
-                                {{ imagePreview ? '✏️ Cambiar Imagen' : '📷 Seleccionar Imagen' }}
+                                {{ imagePreview ? 'Cambiar Imagen' : 'Seleccionar Imagen' }}
                             </button>
                             <img 
                               v-if="imagePreview" 
@@ -335,7 +323,6 @@ async function handleDelete(id) {
                             />
                         </div>
 
-                        <!-- URL externa -->
                         <div v-else>
                             <input 
                               type="url" 
@@ -352,7 +339,7 @@ async function handleDelete(id) {
                               style="margin-top: var(--spacing-sm);"
                             />
                             <p v-if="imageError" class="alert alert-warning" style="margin-top: var(--spacing-sm);">
-                              ⚠️ URL inválida o imagen no disponible
+                              URL inválida o imagen no disponible
                             </p>
                         </div>
                     </div>
@@ -414,7 +401,7 @@ async function handleDelete(id) {
                     <div class="form-actions">
                         <button type="button" @click="closeModal" class="btn btn-secondary">Cancelar</button>
                         <button type="submit" class="btn btn-primary" :disabled="loading">
-                            <span v-if="!loading">{{ editingProduct ? '💾 Actualizar' : '➕ Crear' }}</span>
+                            <span v-if="!loading">{{ editingProduct ? 'Actualizar' : 'Crear' }}</span>
                             <span v-else class="spinner"></span>
                         </button>
                     </div>

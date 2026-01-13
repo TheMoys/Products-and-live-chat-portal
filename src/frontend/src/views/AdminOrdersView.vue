@@ -95,20 +95,17 @@ const getStatusColor = (status) => {
   <div class="admin-orders-view">
     <div class="admin-container">
       
-      <!-- Header -->
       <div class="admin-header">
-        <h1>🛠️ Gestión de Pedidos</h1>
+        <h1>Gestión de Pedidos</h1>
         <button @click="goBack" class="btn btn-secondary">← Volver</button>
       </div>
 
-      <!-- Loading -->
       <div v-if="loading && !stats" class="loading">
         <div class="spinner"></div>
         <p>Cargando...</p>
       </div>
 
       <template v-else>
-        <!-- Estadísticas -->
         <div v-if="stats" class="stats-grid">
           <div class="stat-card total">
             <div class="stat-icon">📊</div>
@@ -159,19 +156,19 @@ const getStatusColor = (status) => {
           </div>
         </div>
 
-        <!-- Filtros -->
-        <div class="filters">
-          <label>Filtrar por estado:</label>
-          <select v-model="filterStatus" @change="loadData">
-            <option value="">📋 Todos</option>
-            <option v-for="status in statusOptions" :key="status.value" :value="status.value">
-              {{ status.label }}
-            </option>
-          </select>
+        <div class="filters-section">
+          <div class="filter-group">
+            <label>Filtrar por estado</label>
+            <select v-model="filterStatus" @change="loadData" class="input-field">
+              <option value="">Todos</option>
+              <option v-for="status in statusOptions" :key="status.value" :value="status.value">
+                {{ status.label }}
+              </option>
+            </select>
+          </div>
         </div>
 
-        <!-- Tabla -->
-        <div class="table-container">
+        <div class="orders-table-container">
           <table class="orders-table">
             <thead>
               <tr>
@@ -209,8 +206,8 @@ const getStatusColor = (status) => {
                   </select>
                 </td>
                 <td>
-                  <button @click="viewDetail(order.id)" class="btn-view">
-                    👁️ Ver
+                  <button @click="viewDetail(order.id)" class="btn btn-primary btn-small">
+                    Ver
                   </button>
                 </td>
               </tr>
@@ -218,7 +215,7 @@ const getStatusColor = (status) => {
           </table>
 
           <div v-if="orders.length === 0" class="empty-state">
-            <p>📦 No hay pedidos</p>
+            <p>No hay pedidos</p>
           </div>
         </div>
       </template>
