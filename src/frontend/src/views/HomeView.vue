@@ -18,6 +18,13 @@
             <router-link to="/my-orders" class="nav-link">
                 📦 Mis Pedidos
             </router-link>
+            <router-link 
+                    v-if="authStore.isAdmin" 
+                    to="/admin/orders" 
+                    class="nav-link admin-link"
+                >
+                    🛠️ Gestión Pedidos
+                </router-link>
         </nav>
 
         <div class="home-content">

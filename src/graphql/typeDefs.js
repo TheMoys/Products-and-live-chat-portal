@@ -70,6 +70,16 @@ const typeDefs = gql`
     cancelled
   }
 
+  type OrderStats {
+    total: Int!
+    pending: Int!
+    processing: Int!
+    shipped: Int!
+    delivered: Int!
+    cancelled: Int!
+    totalRevenue: Float!
+  }
+
   input ShippingAddressInput {
     street: String
     city: String
@@ -90,6 +100,7 @@ const typeDefs = gql`
     myOrders: [Order!]!
     order(id: ID!): Order
     allOrders(status: OrderStatus): [Order!]!
+    orderStats: OrderStats! 
   }
 
   type Mutation {

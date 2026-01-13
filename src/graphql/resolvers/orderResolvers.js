@@ -70,6 +70,38 @@ const orderResolvers = {
         console.error('Error en allOrders:', error);
         throw error;
       }
+    },
+
+    orderStats: async (_, __, { user }) => {
+      if (!user) throw new Error('No autenticado');
+      if (user.role !== 'admin') throw new Error('Acceso denegado - Solo administradores');
+
+      try {
+        const total = await Order.countDocuments();
+        const pending = await Order.countDocuments({ status: 'pending' });
+        const processing = await Order.countDocuments({ status: 'processing' });
+        const shipped = await Order.countDocuments({ status: 'shipped' });
+        const delivered = await Order.countDocuments({ status: 'delivered' });
+        const cancelled = await Order.countDocuments({ status: 'cancelled' });
+
+        const totalRevenue = await Order.aggregate([
+          { $match: { status: { $ne: 'cancelled' } } },
+          { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+        ]);
+
+        return {
+          total,
+          pending,
+          processing,
+          shipped,
+          delivered,
+          cancelled,
+          totalRevenue: totalRevenue[0]?.total || 0
+        };
+      } catch (error) {
+        console.error('Error en orderStats:', error);
+        throw error;
+      }
     }
   },
 

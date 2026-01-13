@@ -64,35 +64,38 @@ const router = createRouter({
             component: () => import('@/views/OrderDetailView.vue'),
             meta: { requiresAuth: true }
         },
+        {
+            path: '/admin/orders',
+            name: 'admin-orders',
+            component: () => import('@/views/AdminOrdersView.vue'),
+            meta: { requiresAuth: true, requiresAdmin: true }
+        },
     ]
 })
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, from, next) => {
     const authStore = useAuthStore()
-
-    if (to.meta.requiresAuth) {
-
-        if (!authStore.isAuthenticated) {
-            const isValid = await authStore.checkAuth()
-
-            if (!isValid) {
-                next('/login')
-                return
-            }
+    const token = localStorage.getItem('token')
+    
+    // Si requiere autenticación
+    if (to.meta.requiresAuth && !token) {
+        return next('/login')
+    }
+    
+    // Si requiere admin
+    if (to.meta.requiresAdmin) {
+        if (!authStore.isAdmin) {
+            alert('⛔ Acceso denegado - Solo administradores')
+            return next('/')
         }
-        next()
     }
-
-    else if (to.meta.guest) {
-        if (authStore.isAuthenticated) {
-            next('/')
-            return
-        }
-        next()
+    
+    // Si ya está autenticado y va a login/register
+    if (to.meta.guest && token) {
+        return next('/')
     }
-    else {
-        next()
-    }
+    
+    next()
 })
 
 export default router

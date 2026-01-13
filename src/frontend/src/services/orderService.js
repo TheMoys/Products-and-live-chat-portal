@@ -115,7 +115,7 @@ const orderService = {
   // Actualizar estado de pedido (ADMIN)
   async updateOrderStatus(orderId, status) {
     const mutation = `
-      mutation UpdateOrderStatus($orderId: ID!, $status: String!) {
+      mutation UpdateOrderStatus($orderId: ID!, $status: OrderStatus!) {
         updateOrderStatus(orderId: $orderId, status: $status) {
           id
           orderNumber
@@ -124,20 +124,15 @@ const orderService = {
         }
       }
     `;
-
-    try {
-      const response = await graphqlClient.request(mutation, { orderId, status });
-      return response.updateOrderStatus;
-    } catch (error) {
-      console.error('Error al actualizar estado de orden:', error);
-      throw error;
-    }
+    
+    const response = await graphqlClient.request(mutation, { orderId, status });
+    return response.updateOrderStatus;
   },
 
   // Obtener todas las órdenes (ADMIN)
   async getAllOrders(statusFilter = null) {
     const query = `
-      query GetAllOrders($status: String) {
+      query GetAllOrders($status: OrderStatus) {
         allOrders(status: $status) {
           id
           orderNumber
@@ -149,17 +144,41 @@ const orderService = {
             username
             email
           }
+          items {
+            title
+            quantity
+            price
+          }
+          shippingAddress {
+            city
+            state
+            country
+          }
         }
       }
     `;
+    
+    const response = await graphqlClient.request(query, { status: statusFilter });
+    return response.allOrders;
+  },
 
-    try {
-      const response = await graphqlClient.request(query, { status: statusFilter });
-      return response.allOrders;
-    } catch (error) {
-      console.error('Error al obtener todas las órdenes:', error);
-      throw error;
-    }
+  async getOrderStats() {
+    const query = `
+      query GetOrderStats {
+        orderStats {
+          total
+          pending
+          processing
+          shipped
+          delivered
+          cancelled
+          totalRevenue
+        }
+      }
+    `;
+    
+    const response = await graphqlClient.request(query);
+    return response.orderStats;
   }
 };
 
