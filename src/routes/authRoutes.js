@@ -16,14 +16,12 @@ router.post('/register', async (req, res) => {
         const existing = await User.findOne({ $or: [{ email }, { username }] });
         if (existing) return res.status(409).json({ message: 'User already exists' });
 
-        const hashed = await bcrypt.hash(password, 10);
-
         let role = 'user'; // Por defecto es usuario normal
         if (adminCode && adminCode === ADMIN_CODE) {
             role = 'admin';
         }
 
-        const user = new User({ username, email, password: hashed, role });
+        const user = new User({ username, email, password, role });
         await user.save();
 
         const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });

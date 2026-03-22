@@ -67,6 +67,16 @@ const routes = {
     conditions: [requireAuth]
   }),
 
+  '/my-orders': wrap({
+    asyncComponent: () => import('../pages/MyOrdersPage.svelte'),
+    conditions: [requireAuth]
+  }),
+
+  '/orders/:id': wrap({
+    asyncComponent: () => import('../pages/OrderDetailPage.svelte'),
+    conditions: [requireAuth]
+  }),
+
   '/profile': wrap({
     asyncComponent: () => import('../pages/ProfilePage.svelte'),
     conditions: [requireAuth]
