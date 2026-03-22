@@ -91,7 +91,6 @@
         <h1 class="page-title">Mis Pedidos</h1>
         <p class="subtitle text-secondary">Historial de todas tus compras</p>
       </div>
-      <button onclick={goBack} class="btn btn-secondary">Volver</button>
     </div>
 
     {#if loading}

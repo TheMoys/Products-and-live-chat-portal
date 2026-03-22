@@ -93,7 +93,6 @@
   <div class="admin-container">
     <div class="admin-header">
       <h1>Gestion de Pedidos</h1>
-      <button class="btn btn-secondary" onclick={goBack}>Volver</button>
     </div>
 
     {#if loading && !stats}

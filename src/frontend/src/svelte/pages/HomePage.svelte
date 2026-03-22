@@ -15,32 +15,6 @@
 </script>
 
 <div class="home-container">
-  <nav class="navbar">
-    <div class="navbar-brand">
-      <h1>Arcane Archives</h1>
-    </div>
-
-    <div class="navbar-links">
-      {#if !getIsAdmin()}
-        <button class="btn btn-secondary" onclick={() => goTo('/cart')}>Carrito</button>
-      {/if}
-
-      <button class="btn btn-secondary" onclick={() => goTo('/my-orders')}>Mis Pedidos</button>
-
-      {#if getIsAdmin()}
-        <button class="btn btn-secondary" onclick={() => goTo('/admin/orders')}>Gestion Pedidos</button>
-        <button class="btn btn-secondary" onclick={() => goTo('/admin/users')}>Gestion Usuarios</button>
-      {/if}
-    </div>
-
-    <div class="user-section">
-      <div class="user-info">
-        <div class="username">{appState.user?.username}</div>
-        <div class="role">{appState.user?.role}</div>
-      </div>
-      <button class="btn btn-danger btn-small" onclick={handleLogout}>Cerrar Sesion</button>
-    </div>
-  </nav>
 
   <div class="home-content">
     <section class="welcome-section">

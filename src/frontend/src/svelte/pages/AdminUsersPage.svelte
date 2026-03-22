@@ -140,7 +140,6 @@
   <div class="admin-container">
     <div class="admin-header">
       <h1>Gestion de Usuarios</h1>
-      <button onclick={goBack} class="btn btn-secondary">Volver</button>
     </div>
 
     {#if loading && !stats}

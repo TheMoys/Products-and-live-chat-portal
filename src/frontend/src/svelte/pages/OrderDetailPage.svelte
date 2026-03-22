@@ -104,13 +104,11 @@
         <p>{error}</p>
         <div class="flex gap-sm mt-sm">
           <button onclick={fetchOrderDetail} class="btn btn-primary btn-small">Reintentar</button>
-          <button onclick={goBack} class="btn btn-secondary btn-small">Volver</button>
         </div>
       </div>
     {:else if currentOrder}
       <div class="order-detail">
         <div class="detail-header">
-          <button onclick={goBack} class="btn btn-secondary">Volver</button>
         </div>
 
         <div class="order-info-card">

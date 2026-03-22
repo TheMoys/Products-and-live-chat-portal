@@ -120,7 +120,6 @@
   <div class="checkout-container">
     <div class="checkout-header">
       <h1 class="page-title">Finalizar Compra</h1>
-      <button onclick={handleCancel} class="btn btn-secondary">Volver</button>
     </div>
 
     {#if loading}

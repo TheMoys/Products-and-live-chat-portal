@@ -189,8 +189,6 @@
       <span class="status-dot"></span>
       {connected ? 'Conectado' : 'Desconectado'}
     </div>
-
-    <button class="btn btn-secondary" onclick={goBack}>Volver</button>
   </header>
 
   <div class="chat-content">

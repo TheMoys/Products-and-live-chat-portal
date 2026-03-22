@@ -10,7 +10,6 @@
 <main class="page">
   <header class="page-header">
     <h1>Perfil</h1>
-    <button class="btn" on:click={goProducts}>Volver a productos</button>
   </header>
 
   <section class="card">

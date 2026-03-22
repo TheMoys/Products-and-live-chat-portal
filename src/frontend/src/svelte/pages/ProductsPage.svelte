@@ -216,11 +216,7 @@
   <header class="products-header">
     <h1>PRODUCTOS</h1>
     <div class="header-actions">
-      {#if !getIsAdmin()}
-        <button onclick={goToMyOrders} class="btn btn-secondary">Mis Pedidos</button>
-        <button onclick={goToCart} class="btn btn-primary">Carrito</button>
-      {:else}
-        <button onclick={goToAdmin} class="btn btn-secondary">Admin Usuarios</button>
+      {#if getIsAdmin()}
         <button onclick={() => openModal()} class="btn btn-success">+ Agregar Producto</button>
       {/if}
     </div>
