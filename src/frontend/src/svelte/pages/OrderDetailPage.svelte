@@ -4,7 +4,7 @@
   import orderService from '../../services/orderService.js';
   import '@/assets/styles/orderDetails.css';
 
-  export let params = {};
+  let { params = {} } = $props();
 
   let currentOrder = $state(null);
   let loading = $state(true);
