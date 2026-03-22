@@ -38,7 +38,12 @@ function requireAdmin() {
 
 const routes = {
   '/': wrap({
-    asyncComponent: () => import('../pages/ProductsPage.svelte'),
+    asyncComponent: () => import('../pages/HomePage.svelte'),
+    conditions: [requireAuth]
+  }),
+
+  '/home': wrap({
+    asyncComponent: () => import('../pages/HomePage.svelte'),
     conditions: [requireAuth]
   }),
 
