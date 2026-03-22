@@ -1,7 +1,7 @@
 {
   "name": "productandchatportal",
   "version": "1.0.0",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "nodemon src/server.js",
@@ -20,14 +20,13 @@
     "graphql": "^16.12.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.0",
-    "pinia": "^2.1.7",
     "socket.io": "^4.6.0",
     "socket.io-client": "^4.8.1",
-    "vue": "^3.3.8",
-    "vue-router": "^4.2.5"
+    "svelte": "^5.54.1",
+    "svelte-spa-router": "^5.0.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.5.0",
+    "@sveltejs/vite-plugin-svelte": "^4.0.4",
     "concurrently": "^8.2.2",
     "nodemon": "^3.0.1",
     "vite": "^5.0.0"

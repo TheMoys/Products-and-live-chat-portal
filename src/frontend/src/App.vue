@@ -3,7 +3,7 @@
     <div id="app" class="gaming-app">
         <div v-if="loading" class="app-loading">
             <div class="loading-spinner"></div>
-            <p>Cargando...</p>
+            <p>Cargando...AAAAAAAAAAAAAAAAAAAA</p>
         </div>
         <RouterView v-else />
     </div>
