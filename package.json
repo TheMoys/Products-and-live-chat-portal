@@ -1,7 +1,6 @@
 {
   "name": "productandchatportal",
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "nodemon src/server.js",
