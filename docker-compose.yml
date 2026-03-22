@@ -1,14 +1,17 @@
-version: '3.8'
-
 services:
   mongodb:
-    image: mongo:7
+    image: public.ecr.aws/docker/library/mongo:7
     container_name: uneat-mongodb
     restart: unless-stopped
     ports:
       - "27018:27017"
     volumes:
       - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 }).ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks:
       - uneat-network
 
@@ -20,12 +23,13 @@ services:
       - "3000:3000"
       - "5173:5173"
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
     env_file:
       - .env
     volumes:
-      - .:/app                # Montar todo el proyecto
-      - /app/node_modules     # Excluir node_modules
+      - .:/app
+      - /app/node_modules
     networks:
       - uneat-network
 
