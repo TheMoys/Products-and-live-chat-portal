@@ -92,6 +92,11 @@ const routes = {
     conditions: [requireAdmin]
   }),
 
+  '/chat': wrap({
+    asyncComponent: () => import('../pages/ChatPage.svelte'),
+    conditions: [requireAuth]
+  }),
+
   '*': wrap({
     asyncComponent: () => import('../pages/NotFoundPage.svelte')
   })
