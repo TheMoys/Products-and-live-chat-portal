@@ -57,6 +57,16 @@ const routes = {
     conditions: [requireAuth]
   }),
 
+  '/cart': wrap({
+    asyncComponent: () => import('../pages/CartPage.svelte'),
+    conditions: [requireAuth]
+  }),
+
+  '/checkout': wrap({
+    asyncComponent: () => import('../pages/CheckoutPage.svelte'),
+    conditions: [requireAuth]
+  }),
+
   '/profile': wrap({
     asyncComponent: () => import('../pages/ProfilePage.svelte'),
     conditions: [requireAuth]
