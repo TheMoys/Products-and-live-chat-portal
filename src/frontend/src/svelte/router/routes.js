@@ -87,6 +87,11 @@ const routes = {
     conditions: [requireAdmin]
   }),
 
+  '/admin/orders': wrap({
+    asyncComponent: () => import('../pages/AdminOrdersPage.svelte'),
+    conditions: [requireAdmin]
+  }),
+
   '*': wrap({
     asyncComponent: () => import('../pages/NotFoundPage.svelte')
   })
