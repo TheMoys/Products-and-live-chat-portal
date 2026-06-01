@@ -15,13 +15,13 @@ services:
     networks:
       - uneat-network
 
-  app:
+  # Backend Python FastAPI
+  backend:
     build: .
-    container_name: uneat-app
+    container_name: uneat-backend
     restart: unless-stopped
     ports:
       - "3000:3000"
-      - "5173:5173"
     depends_on:
       mongodb:
         condition: service_healthy
@@ -31,6 +31,23 @@ services:
       - .:/app
     networks:
       - uneat-network
+    command: sh -c "cd /app/src && python -m uvicorn app.main:app --host 0.0.0.0 --port 3000"
+
+  # Frontend Svelte
+  frontend:
+    image: node:20-alpine
+    container_name: uneat-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    working_dir: /app
+    volumes:
+      - .:/app
+    networks:
+      - uneat-network
+    command: sh -c "cd /app/src/frontend && npm install && npm run dev -- --host"
+    environment:
+      - VITE_API_URL=http://backend:3000
 
 networks:
   uneat-network:

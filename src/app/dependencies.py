@@ -1,11 +1,11 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthCredentials
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.services.auth_service import AuthService
 from app.repositories.user_repository import UserRepository
 
 security = HTTPBearer()
 
-async def get_current_user(credentials: HTTPAuthCredentials = Depends(security)):
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     """Dependencia para obtener usuario autenticado"""
     token = credentials.credentials
     

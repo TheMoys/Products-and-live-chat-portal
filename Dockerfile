@@ -14,5 +14,8 @@ COPY . .
 # Exponer puertos
 EXPOSE 3000 5173
 
+# Cambiar a directorio src para que los imports funcionen
+WORKDIR /app/src
+
 # Ejecutar el backend FastAPI
-CMD ["python", "-m", "uvicorn", "src.app.main:app", "--host", "0.0.0.0", "--port", "3000"]
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "3000"]

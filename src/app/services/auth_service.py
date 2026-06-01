@@ -16,8 +16,11 @@ class AuthService:
         # Determinar rol
         role = 'admin' if admin_code == settings.admin_code else 'user'
         
-        # Crear usuario
-        user = UserRepository.create(username, email, password, role)
+        # Hashear contraseña AQUÍ, antes de pasarla al modelo
+        hashed_password = PasswordHandler.hash_password(password)
+        
+        # Crear usuario con contraseña ya hasheada
+        user = UserRepository.create(username, email, hashed_password, role)
         
         # Generar token
         token = JWTHandler.create_token(str(user._id))

@@ -136,7 +136,7 @@ Crea dependencias FastAPI para:
 **Respuesta de IA:** ✅ CORRECTO
 ```python
 # Exactamente lo que necesitábamos
-async def get_current_user(credentials: HTTPAuthCredentials = Depends(security)):
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = credentials.credentials
     # ... validación
     return user
