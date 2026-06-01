@@ -1,12 +1,12 @@
-FROM public.ecr.aws/docker/library/node:20-alpine
+FROM public.ecr.aws/docker/library/python:3.11-slim
 
 WORKDIR /app
 
-# Copiar package.json y package-lock.json
-COPY package*.json ./
+# Copiar requirements.txt
+COPY requirements.txt .
 
 # Instalar dependencias
-RUN npm ci
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar el resto del código
 COPY . .
@@ -14,5 +14,5 @@ COPY . .
 # Exponer puertos
 EXPOSE 3000 5173
 
-# Usar el script "dev" de tu package.json
-CMD ["npm", "run", "dev"]
+# Ejecutar el backend FastAPI
+CMD ["python", "-m", "uvicorn", "src.app.main:app", "--host", "0.0.0.0", "--port", "3000"]
