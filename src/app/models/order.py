@@ -1,8 +1,10 @@
 from datetime import datetime
 from bson import ObjectId
-from app.config import get_db
+from pymongo import MongoClient
+from app.config import settings
 
-db = get_db()
+client = MongoClient(settings.mongodb_uri)
+db = client.get_database()
 orders_collection = db['orders']
 
 class Order:

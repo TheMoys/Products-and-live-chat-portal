@@ -1,10 +1,12 @@
 from datetime import datetime
 from bson import ObjectId
-from app.config import get_db
+from pymongo import MongoClient
+from app.config import settings
 
-db = get_db()
+client = MongoClient(settings.mongodb_uri)
+db = client.get_database()
 messages_collection = db['messages']
-messages_collection.create_index('createdAt', -1)
+messages_collection.create_index([('createdAt', -1)])
 
 class Message:
     def __init__(self, user_id: str, username: str, text: str, _id: str = None):
