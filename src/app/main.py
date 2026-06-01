@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, users, products
+from app.routers import auth, users, products, orders, cart, chat
 from app.config import settings
 
 # Crear aplicación FastAPI
@@ -38,6 +38,9 @@ async def health_check():
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(products.router)
+app.include_router(orders.router)
+app.include_router(cart.router)
+app.include_router(chat.router)
 
 if __name__ == "__main__":
     import uvicorn
