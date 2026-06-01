@@ -1,8 +1,8 @@
 from datetime import datetime
 from bson import ObjectId
-from app.config import settings
+from app.config import get_db
 
-db = settings.get_db()
+db = get_db()
 orders_collection = db['orders']
 
 class Order:
