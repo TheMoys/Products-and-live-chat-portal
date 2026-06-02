@@ -83,7 +83,6 @@ class ShippingAddressInput:
 class Query:
     @strawberry.field
     def my_orders(self, info) -> List[Order]:
-        # Obtener usuario del contexto
         user_id = info.context.get("user_id")
         if not user_id:
             raise Exception("No autenticado")
@@ -101,13 +100,21 @@ class Query:
             items_data = []
             for item in order.items:
                 product_doc = ProductRepository.get_by_id(item['product'])
-                product_data = Product(
-                    id=item['product'],
-                    title=item.get('title', ''),
-                    imageUrl=product_doc.image_url if product_doc else None,
-                    imageData=product_doc.image_data if product_doc else None,
-                    description=product_doc.description if product_doc else None
-                )
+                
+                if product_doc:
+                    product_data = Product(
+                        id=item['product'],
+                        title=item.get('title', ''),
+                        imageUrl=getattr(product_doc, 'image_url', None),
+                        imageData=getattr(product_doc, 'image_data', None),
+                        description=getattr(product_doc, 'description', None)
+                    )
+                else:
+                    product_data = Product(
+                        id=item['product'],
+                        title=item.get('title', 'Producto no encontrado'),
+                    )
+                    
                 items_data.append(OrderItem(
                     title=item['title'],
                     quantity=item['quantity'],
@@ -134,13 +141,14 @@ class Query:
         return result
 
     @strawberry.field
-    def my_orders(self, info) -> List[Order]:
-        # Obtener usuario del contexto
+    def all_orders(self, info, status: Optional[OrderStatus] = None) -> List[Order]:
         user_id = info.context.get("user_id")
         if not user_id:
             raise Exception("No autenticado")
-
-        orders = OrderService.get_user_orders(user_id)
+        
+        status_value = status.value if status else None
+        orders = OrderService.get_all_orders(status_value)
+        
         result = []
         for order in orders:
             user_doc = UserRepository.get_by_id(str(order.user))
@@ -153,13 +161,21 @@ class Query:
             items_data = []
             for item in order.items:
                 product_doc = ProductRepository.get_by_id(item['product'])
-                product_data = Product(
-                    id=item['product'],
-                    title=item.get('title', ''),
-                    imageUrl=product_doc.image_url if product_doc else None,
-                    imageData=product_doc.image_data if product_doc else None,
-                    description=product_doc.description if product_doc else None
-                )
+                
+                if product_doc:
+                    product_data = Product(
+                        id=item['product'],
+                        title=item.get('title', ''),
+                        imageUrl=getattr(product_doc, 'image_url', None),
+                        imageData=getattr(product_doc, 'image_data', None),
+                        description=getattr(product_doc, 'description', None)
+                    )
+                else:
+                    product_data = Product(
+                        id=item['product'],
+                        title=item.get('title', 'Producto no encontrado'),
+                    )
+
                 items_data.append(OrderItem(
                     title=item['title'],
                     quantity=item['quantity'],
@@ -183,6 +199,7 @@ class Query:
                     country=order.shipping_address.get('country')
                 )
             ))
+            
         return result
 
     @strawberry.field
@@ -201,13 +218,21 @@ class Query:
         items_data = []
         for item in order.items:
             product_doc = ProductRepository.get_by_id(item['product'])
-            product_data = Product(
-                id=item['product'],
-                title=item.get('title', ''),
-                imageUrl=product_doc.image_url if product_doc else None,
-                imageData=product_doc.image_data if product_doc else None,
-                description=product_doc.description if product_doc else None
-            )
+            
+            if product_doc:
+                product_data = Product(
+                    id=item['product'],
+                    title=item.get('title', ''),
+                    imageUrl=getattr(product_doc, 'image_url', None),
+                    imageData=getattr(product_doc, 'image_data', None),
+                    description=getattr(product_doc, 'description', None)
+                )
+            else:
+                product_data = Product(
+                    id=item['product'],
+                    title=item.get('title', 'Producto no encontrado'),
+                )
+                
             items_data.append(OrderItem(
                 title=item['title'],
                 quantity=item['quantity'],

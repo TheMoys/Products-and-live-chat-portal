@@ -33,12 +33,14 @@ class OrderRepository:
 
     @staticmethod
     def count_all() -> int:
-        from app.config import settings
-        db = settings.get_db()
+        # Importamos la función get_db directamente
+        from app.config import get_db
+        db = get_db()
         return db['orders'].count_documents({})
 
     @staticmethod
     def count_by_status(status: str) -> int:
-        from app.config import settings
-        db = settings.get_db()
+        # Importamos la función get_db directamente
+        from app.config import get_db
+        db = get_db()
         return db['orders'].count_documents({'status': status})
