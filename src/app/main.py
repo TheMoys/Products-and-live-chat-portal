@@ -17,9 +17,14 @@ async def get_graphql_context(request: Request):
     if token:
         from app.security.jwt import JWTHandler
         try:
-            # Asegúrate de que verify_token devuelve el ID correctamente
-            user_id = JWTHandler.verify_token(token)
-        except Exception:
+            # Recibimos el payload completo (el diccionario)
+            token_payload = JWTHandler.verify_token(token)
+            
+            # Verificamos que sea un diccionario y extraemos el ID
+            if isinstance(token_payload, dict):
+                user_id = token_payload.get("id")
+        except Exception as e:
+            print(f"Error extrayendo ID del token: {e}")
             pass
     
     return {"user_id": user_id, "request": request}
