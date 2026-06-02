@@ -1,27 +1,37 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import auth, users, products, orders, cart, chat
 from app.config import settings
 from strawberry.fastapi import GraphQLRouter
 from app.graphql.schema import schema
 from app.socketio_config import sio
+import socketio  # Necesario para el adaptador ASGI
 import json
 
-# Crear aplicación FastAPI
+# 1. Definir dependencias y contextos PRIMERO
+async def get_graphql_context(request: Request):
+    """Obtener contexto de autenticación para GraphQL"""
+    token = request.headers.get("Authorization", "").replace("Bearer ", "")
+    user_id = None
+    
+    if token:
+        from app.security.jwt import JWTHandler
+        try:
+            # Asegúrate de que verify_token devuelve el ID correctamente
+            user_id = JWTHandler.verify_token(token)
+        except Exception:
+            pass
+    
+    return {"user_id": user_id, "request": request}
+
+# 2. Crear aplicación FastAPI
 app = FastAPI(
     title="Products and Live Chat Portal",
     version="2.0.0",
     description="Backend en Python con FastAPI"
 )
 
-# Envolver con Socket.io
-app.sio = sio
-
-# GraphQL
-graphql_app = GraphQLRouter(schema)
-app.include_router(graphql_app, prefix="/graphql")
-
-# Configurar CORS
+# 3. Configurar CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -38,6 +48,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 4. Configurar e incluir GraphQL (Una sola vez, con contexto)
+graphql_app = GraphQLRouter(schema, context_getter=get_graphql_context)
+app.include_router(graphql_app, prefix="/graphql")
+
+# 5. Incluir routers REST
+app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(products.router)
+app.include_router(orders.router)
+app.include_router(cart.router)
+app.include_router(chat.router)
 
 # Health check
 @app.get("/health")
@@ -62,31 +84,10 @@ async def message(sid, data):
     print(f"Mensaje recibido: {data}")
     await sio.emit('message', data, broadcast=True)
 
-# Incluir routers
-app.include_router(auth.router)
-app.include_router(users.router)
-app.include_router(products.router)
-app.include_router(orders.router)
-app.include_router(cart.router)
-app.include_router(chat.router)
-
-async def get_graphql_context(request):
-    """Obtener contexto de autenticación para GraphQL"""
-    token = request.headers.get("Authorization", "").replace("Bearer ", "")
-    user_id = None
-    
-    if token:
-        from app.security.jwt import JWTHandler
-        try:
-            user_id = JWTHandler.verify_token(token)
-        except:
-            pass
-    
-    return {"user_id": user_id, "request": request}
-
-# Actualizar GraphQL router
-graphql_app = GraphQLRouter(schema, context_getter=get_graphql_context)
+# 6. Integración ASGI correcta para Socket.IO y FastAPI
+socket_app = socketio.ASGIApp(sio, other_asgi_app=app)
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=settings.port)
+    # IMPORTANTE: Debemos correr 'socket_app', no 'app'
+    uvicorn.run(socket_app, host="0.0.0.0", port=settings.port)

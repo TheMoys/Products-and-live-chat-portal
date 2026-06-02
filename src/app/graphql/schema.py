@@ -48,7 +48,7 @@ class Order:
     id: str
     orderNumber: str
     totalAmount: float
-    status: str
+    status: OrderStatus
     createdAt: str
     user: User
     items: List[OrderItem]
