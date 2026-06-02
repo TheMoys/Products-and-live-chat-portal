@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import auth, users, products, orders, cart, chat
 from app.config import settings
+from strawberry.fastapi import GraphQLRouter
+from app.graphql.schema import schema
 
 # Crear aplicación FastAPI
 app = FastAPI(
@@ -10,6 +12,9 @@ app = FastAPI(
     description="Backend en Python con FastAPI"
 )
 
+graphql_app = GraphQLRouter(schema)
+app.include_router(graphql_app, prefix="/graphql")
+
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
@@ -17,7 +22,9 @@ app.add_middleware(
         "http://localhost:5173",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000"
+        "http://127.0.0.1:3000",
+        "http://frontend:5173",
+        "http://backend:3000",
     ],
     allow_credentials=True,
     allow_methods=["*"],
