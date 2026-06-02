@@ -82,8 +82,13 @@ class ShippingAddressInput:
 @strawberry.type
 class Query:
     @strawberry.field
-    def all_orders(self, status: Optional[str] = None) -> List[Order]:
-        orders = OrderService.get_all_orders(status)
+    def my_orders(self, info) -> List[Order]:
+        # Obtener usuario del contexto
+        user_id = info.context.get("user_id")
+        if not user_id:
+            raise Exception("No autenticado")
+        
+        orders = OrderService.get_user_orders(user_id)
         result = []
         for order in orders:
             user_doc = UserRepository.get_by_id(str(order.user))
@@ -129,7 +134,12 @@ class Query:
         return result
 
     @strawberry.field
-    def my_orders(self, user_id: str) -> List[Order]:
+    def my_orders(self, info) -> List[Order]:
+        # Obtener usuario del contexto
+        user_id = info.context.get("user_id")
+        if not user_id:
+            raise Exception("No autenticado")
+
         orders = OrderService.get_user_orders(user_id)
         result = []
         for order in orders:

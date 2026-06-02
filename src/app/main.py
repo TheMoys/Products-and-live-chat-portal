@@ -30,7 +30,7 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000",
         "http://frontend:5173",
-        "http://backend:3000",
+        "http://backend:3000",  
         "http://0.0.0.0:5173",
         "http://0.0.0.0:3000"
     ],
@@ -69,6 +69,23 @@ app.include_router(products.router)
 app.include_router(orders.router)
 app.include_router(cart.router)
 app.include_router(chat.router)
+
+async def get_graphql_context(request):
+    """Obtener contexto de autenticación para GraphQL"""
+    token = request.headers.get("Authorization", "").replace("Bearer ", "")
+    user_id = None
+    
+    if token:
+        from app.security.jwt import JWTHandler
+        try:
+            user_id = JWTHandler.verify_token(token)
+        except:
+            pass
+    
+    return {"user_id": user_id, "request": request}
+
+# Actualizar GraphQL router
+graphql_app = GraphQLRouter(schema, context_getter=get_graphql_context)
 
 if __name__ == "__main__":
     import uvicorn
