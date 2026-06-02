@@ -4,6 +4,8 @@ from app.routers import auth, users, products, orders, cart, chat
 from app.config import settings
 from strawberry.fastapi import GraphQLRouter
 from app.graphql.schema import schema
+from app.socketio_config import sio
+import json
 
 # Crear aplicación FastAPI
 app = FastAPI(
@@ -12,6 +14,10 @@ app = FastAPI(
     description="Backend en Python con FastAPI"
 )
 
+# Envolver con Socket.io
+app.sio = sio
+
+# GraphQL
 graphql_app = GraphQLRouter(schema)
 app.include_router(graphql_app, prefix="/graphql")
 
@@ -25,6 +31,8 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://frontend:5173",
         "http://backend:3000",
+        "http://0.0.0.0:5173",
+        "http://0.0.0.0:3000"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -34,12 +42,25 @@ app.add_middleware(
 # Health check
 @app.get("/health")
 async def health_check():
-    """Verificar que el servidor está funcionando"""
     return {
         "status": "ok",
         "timestamp": __import__('datetime').datetime.utcnow().isoformat(),
         "cors": "enabled"
     }
+
+# Socket.io events
+@sio.event
+async def connect(sid, environ, auth):
+    print(f"Cliente conectado: {sid}")
+
+@sio.event
+async def disconnect(sid):
+    print(f"Cliente desconectado: {sid}")
+
+@sio.event
+async def message(sid, data):
+    print(f"Mensaje recibido: {data}")
+    await sio.emit('message', data, broadcast=True)
 
 # Incluir routers
 app.include_router(auth.router)
