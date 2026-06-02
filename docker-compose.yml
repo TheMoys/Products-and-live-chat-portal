@@ -46,8 +46,8 @@ services:
     networks:
       - uneat-network
     command: sh -c "cd /app/src/frontend && npm install && npm run dev -- --host"
-    environment:
-      - VITE_API_URL=http://backend:3000
+    env_file:         # Añadimos esto
+      - .env
 
 networks:
   uneat-network:

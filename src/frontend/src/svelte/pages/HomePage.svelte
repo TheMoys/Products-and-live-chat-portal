@@ -31,12 +31,6 @@
           <span class="admin-badge">Gestion Admin</span>
         {/if}
       </div>
-
-      <div class="nav-card" onclick={() => goTo('/chat')}>
-        <div class="nav-card-icon">💬</div>
-        <h3>Chat</h3>
-        <p>Comunicacion en tiempo real</p>
-      </div>
     </div>
   </div>
 </div>

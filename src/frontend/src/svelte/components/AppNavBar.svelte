@@ -43,7 +43,6 @@
     {#if appState.token}
       <button class:active={isActive('/home')} onclick={() => go('/home')}>Home</button>
       <button class:active={isActive('/products')} onclick={() => go('/products')}>Productos</button>
-      <button class:active={isActive('/chat')} onclick={() => go('/chat')}>Chat</button>
       <button class:active={isActive('/my-orders')} onclick={() => go('/my-orders')}>Pedidos</button>
 
       {#if getIsAdmin()}
